@@ -18,6 +18,15 @@
   the selected/default case and keeps the functions general enough to change inputs/models.
 */
 
+const MODULATION_TABLE = Object.freeze({
+  'PAM2':  { name: 'PAM2',  bitsPerSymbol: 1.0, symbolsPerSample: 1.0,    slicerLevels: 2, psdType: 'ZOH' },
+  'PAM4':  { name: 'PAM4',  bitsPerSymbol: 2.0, symbolsPerSample: 0.5,    slicerLevels: 4, psdType: 'ZOH' },
+  'PAM8':  { name: 'PAM8',  bitsPerSymbol: 3.0, symbolsPerSample: 0.3333, slicerLevels: 8, psdType: 'ZOH' },
+  'PAM16': { name: 'PAM16', bitsPerSymbol: 4.0, symbolsPerSample: 0.25,   slicerLevels: 16, psdType: 'ZOH' },
+  'DME':   { name: 'DME',   bitsPerSymbol: 0.5, symbolsPerSample: 2.0,    slicerLevels: 2, psdType: 'DME' },
+  '3B2T':  { name: '3B2T',  bitsPerSymbol: 1.5, symbolsPerSample: 0.6667, slicerLevels: 3, psdType: 'ZOH' }
+});
+
 const DEFAULT_INPUTS = Object.freeze({
   dataRateGbpsUs: 25,
   dataRateGbpsDs: 25,
@@ -25,6 +34,8 @@ const DEFAULT_INPUTS = Object.freeze({
   cableLengthM: 11,
   wireReflectionLimit: 'jonsson*12_08_20',
   numberOfConnectors: 4,
+  modulationUs: 'PAM4',
+  modulationDs: 'PAM4',
   pamUs: 4,
   pamDs: 4,
   fecBlockSize: 360,
@@ -182,8 +193,18 @@ function channelInsertionLossPerMeterDb(fHz, modelName, temperatureC) {
   return m.b0 * Math.pow((1 + m.drho * (temperatureC - 20)) * fHz, m.p) + m.b1 * fHz;
 }
 
+function getModulation(direction, input) {
+  const modName = direction === 'us'
+    ? (input.modulationUs ?? ('PAM' + (input.pamUs ?? 4)))
+    : (input.modulationDs ?? ('PAM' + (input.pamDs ?? 4)));
+  return MODULATION_TABLE[modName] || MODULATION_TABLE['PAM4'];
+}
+
 function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) {
-  const pam = direction === 'us' ? input.pamUs : input.pamDs;
+  const mod = getModulation(direction, input);
+  const levels = mod.slicerLevels;
+  const bitsPerSymbol = mod.bitsPerSymbol;
+
   const targetBer = input.targetBer;
   const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize) : (input.fecBlockSizeDs ?? input.fecBlockSize);
   const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize) : (input.fecDataSizeDs ?? input.fecDataSize);
@@ -193,10 +214,10 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
   const correctionSymbols = Math.floor(((n - k) / 2) * eff);
   const avgErrorsPerBlock = chiSqInv(targetBer, 2 * (correctionSymbols + 1)) / 2;
   const avgErrorsPerSymbol = avgErrorsPerBlock / n;
-  const requiredSlicerBer = 1 - Math.pow(1 - avgErrorsPerSymbol, log10(pam) / log10(2) / bitsPerSym);
+  const requiredSlicerBer = 1 - Math.pow(1 - avgErrorsPerSymbol, bitsPerSymbol / bitsPerSym);
   const requiredGaussianSlicerBer = requiredSlicerBer - input.impulseErrorRate;
-  const normalArg = 1 - pam * requiredGaussianSlicerBer / 2 / (pam - 1);
-  const requiredSnrLinear = (pam * pam - 1) / 3 * Math.pow(normInv(normalArg), 2);
+  const normalArg = 1 - levels * requiredGaussianSlicerBer / 2 / (levels - 1);
+  const requiredSnrLinear = (levels * levels - 1) / 3 * Math.pow(normInv(normalArg), 2);
   return {
     correctionSymbols,
     avgErrorsPerBlock,
@@ -210,14 +231,15 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
 
 function computeSampleRateAndNyquist(direction, input) {
   const dataRateGbps = direction === 'us' ? input.dataRateGbpsUs : input.dataRateGbpsDs;
-  const pam = direction === 'us' ? input.pamUs : input.pamDs;
+  const mod = getModulation(direction, input);
+  const bitsPerSymbol = mod.bitsPerSymbol;
   const duty = direction === 'us' ? input.tddDutyCycleUs : input.tddDutyCycleDs;
   
   const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize) : (input.fecBlockSizeDs ?? input.fecBlockSize);
   const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize) : (input.fecDataSizeDs ?? input.fecDataSize);
   const fecMultiplier = n / k;
   
-  const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / (log10(pam) / log10(2)) / duty * (1 + input.framingOverhead);
+  const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / bitsPerSymbol / duty * (1 + input.framingOverhead);
   return { sampleRateHz, nyquistHz: sampleRateHz / 2 };
 }
 
@@ -235,8 +257,16 @@ function psdMaskDbmPerHz(kind, direction, fHz, input, nyquistHz) {
     case 'PSD_brick':
       return linearToDb(dbToLinear(txPowerDbm) / nyquistHz) + (fHz > nyquistHz ? -50 : 0);
     case 'PSD_ZOH': {
-      const x = Math.PI * fHz / (2 * nyquistHz);
-      return 20 * log10(Math.abs(sinc(x))) + txPowerDbm - 10 * log10(nyquistHz) + 1.11;
+      const mod = getModulation(direction, input);
+      const rSym = nyquistHz * 2;
+      const u = Math.PI * fHz / rSym;
+      if (mod.psdType === 'DME') {
+        const sincPart = 20 * log10(Math.abs(sinc(u)));
+        const sinPart = 20 * log10(Math.abs(Math.sin(u)) + 1e-15);
+        return sincPart + sinPart + txPowerDbm - 10 * log10(nyquistHz) + 1.11 + 6.02;
+      } else {
+        return 20 * log10(Math.abs(sinc(u))) + txPowerDbm - 10 * log10(nyquistHz) + 1.11;
+      }
     }
     case 'Butterworth':
       return 10 * log10(1 / (1 + Math.pow(fHz / nyquistHz, 6))) + txPowerDbm - 10 * log10(nyquistHz) + 0.45;
@@ -328,6 +358,9 @@ function compute(inputOverrides = {}) {
   const estimatedSlicerSnrDbUs = theoreticalSlicerSnrDbUs - input.implementationLossDbUs;
   const estimatedSlicerSnrDbDs = theoreticalSlicerSnrDbDs - input.implementationLossDbDs;
 
+  const modulationUs = getModulation('us', input);
+  const modulationDs = getModulation('ds', input);
+
   return {
     input,
     fStepHz,
@@ -337,6 +370,8 @@ function compute(inputOverrides = {}) {
     nyquistHzDs: dsRate.nyquistHz,
     fecUs,
     fecDs,
+    modulationUs,
+    modulationDs,
     theoreticalSlicerSnrDbUs,
     theoreticalSlicerSnrDbDs,
     estimatedSlicerSnrDbUs,
@@ -376,6 +411,7 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     DEFAULT_INPUTS,
     CHANNEL_MODELS,
     CONNECTOR_ECHO_C0,
+    MODULATION_TABLE,
     normInv,
     chiSqInv,
     psdMaskDbmPerHz,
@@ -387,5 +423,6 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   window.DEFAULT_INPUTS = DEFAULT_INPUTS;
   window.CHANNEL_MODELS = CHANNEL_MODELS;
   window.CONNECTOR_ECHO_C0 = CONNECTOR_ECHO_C0;
+  window.MODULATION_TABLE = MODULATION_TABLE;
 }
 

@@ -318,7 +318,30 @@
           SNR_Theoretical = Integral_from_0_to_Nyquist( SNR(f) * df ) / NyquistFrequency
         </div>
         <p>
-          The <strong>Estimated Slicer SNR</strong> is then computed as the theoretical SNR minus the specified transceiver Implementation Loss. The **SNR Margin** displays the excess SNR available over the Required Slicer SNR (which is determined by target BER, PAM level, and FEC coding capability). A positive margin (margin &ge; 0 dB) results in a **PASS**, while a negative margin results in a **FAIL**.
+          The <strong>Estimated Slicer SNR</strong> is then computed as the theoretical SNR minus the specified transceiver Implementation Loss. The **SNR Margin** displays the excess SNR available over the Required Slicer SNR (which is determined by target BER, modulation scheme, and FEC coding capability). A positive margin (margin &ge; 0 dB) results in a **PASS**, while a negative margin results in a **FAIL**.
+        </p>
+
+        <h3>2.4 Modulation &amp; Spectral Efficiency</h3>
+        <p>
+          The simulation engine generalizes transmission modulation schemes by mapping each to unique spectral efficiency, decision levels, and PSD base shapes:
+        </p>
+        <ul>
+          <li><strong>Pulse Amplitude Modulation (PAM-M)</strong>: Supports PAM2 (NRZ), PAM4, PAM8, and PAM16. The spectral efficiency is $m = \log_2(M)$ bits per symbol, and the slicer levels count is $M$. The symbol Baud rate is computed as:
+            <div style="font-family: var(--font-mono); background-color: var(--bg-card); padding: 0.5rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem; margin: 0.5rem 0 1rem 0;">
+              R_sym = R_bit * (N_FEC / K_FEC) / m / DutyCycle * (1 + FramingOverhead)
+            </div>
+          </li>
+          <li><strong>Differential Manchester Encoding (DME)</strong>: DME represents each bit by transition timing, requiring two physical symbol phases per bit ($0.5$ bits/symbol). It utilizes $2$ slicer levels, and its wider bandwidth requires twice the symbol Baud rate of PAM2.</li>
+          <li><strong>3B2T (3 Bits to 2 Trits)</strong>: Encodes blocks of $3$ bits into $2$ ternary symbols (trits), yielding $1.5$ bits/symbol (trit) efficiency. It requires $3$ slicer levels, and scales the Baud rate to $(2/3) \times \text{bit rate}$ (plus FEC and overhead).</li>
+        </ul>
+        <p>
+          For DME modulation, a specialized PSD mask is applied to model the Manchester encoding's spectral null at DC ($f = 0$):
+        </p>
+        <div style="font-family: var(--font-mono); background-color: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem; margin-bottom: 1rem;">
+          S_DME(f) = S_ZOH(f) * sin^2(pi * f / R_sym)
+        </div>
+        <p>
+          where $S_{ZOH}(f)$ represents the standard Zero-Order Hold power spectral density shaping. This shifts power away from DC toward high frequencies, affecting in-band SNR integration.
         </p>
       </section>
 
@@ -377,9 +400,9 @@
               <td>Selects the connector quality coefficient ($C_0$): Bad ($7.5 \times 10^{-11}$), Hard ($1.7 \times 10^{-11}$), Good ($1.0 \times 10^{-12}$), Easy ($1.0 \times 10^{-14}$).</td>
             </tr>
             <tr>
-              <td><code>pamUs</code> / <code>pamDs</code></td>
-              <td>4</td>
-              <td>Pulse Amplitude Modulation levels. Determines bits per symbol (e.g. 2 = NRZ, 4 = PAM4, etc.) for Upstream/Downstream.</td>
+              <td><code>modulationUs</code> / <code>modulationDs</code></td>
+              <td>PAM4</td>
+              <td>Line modulation scheme. Selectable options include PAM2, PAM4, PAM8, PAM16, DME (Differential Manchester Encoding), and 3B2T (3 Bits to 2 Trits). Determines bits per symbol, symbols per sample, and decision levels for Upstream/Downstream.</td>
             </tr>
             <tr>
               <td><code>txPowerDbmUs</code> / <code>txPowerDbmDs</code></td>

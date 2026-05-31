@@ -97,12 +97,12 @@
         <div class="form-section-title">Transceiver & Modulation</div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="pamUs" title="Pulse Amplitude Modulation level for upstream (2 = NRZ, 4 = PAM4, etc.)">Upstream PAM</label>
-            <input type="number" id="pamUs" name="pamUs" min="2" max="16" step="2">
+            <label for="modulationUs" title="Line modulation scheme for upstream channel">Upstream Modulation</label>
+            <select id="modulationUs" name="modulationUs"></select>
           </div>
           <div class="form-group">
-            <label for="pamDs" title="Pulse Amplitude Modulation level for downstream (2 = NRZ, 4 = PAM4, etc.)">Downstream PAM</label>
-            <input type="number" id="pamDs" name="pamDs" min="2" max="16" step="2">
+            <label for="modulationDs" title="Line modulation scheme for downstream channel">Downstream Modulation</label>
+            <select id="modulationDs" name="modulationDs"></select>
           </div>
           <div class="form-group">
             <label for="txPowerDbmUs" title="Upstream transmit power in decibel-milliwatts">Tx Power US (dBm)</label>
@@ -425,28 +425,66 @@
               </div>
             </div>
             
-            <div style="margin-top: 1.5rem;">
-              <table class="budget-table" style="max-width: 500px;">
-                <thead>
-                  <tr>
-                    <th colspan="3">Common Channel Losses @ Nyquist</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Cable Insertion Loss @ Nyq Us</td>
-                    <td id="tdCableLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
-                  </tr>
-                  <tr>
-                    <td>Total Channel Insertion Loss @ Nyq Us</td>
-                    <td id="tdChannelLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
-                  </tr>
-                  <tr>
-                    <td>Wire Echo Baseline Limit</td>
-                    <td id="tdWireEcho" style="text-align: right; font-family: var(--font-mono);">--</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div style="margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+              <div>
+                <table class="budget-table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Common Channel Losses @ Nyquist</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Cable Insertion Loss @ Nyq Us</td>
+                      <td id="tdCableLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Total Channel Insertion Loss @ Nyq Us</td>
+                      <td id="tdChannelLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Wire Echo Baseline Limit</td>
+                      <td id="tdWireEcho" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table class="budget-table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Selected Modulation Schema Reference</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Modulation Schema</td>
+                      <td id="tdModNameUs" style="text-align: right; font-family: var(--font-mono); color: var(--us-color);">--</td>
+                      <td id="tdModNameDs" style="text-align: right; font-family: var(--font-mono); color: var(--ds-color);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Bits per Symbol</td>
+                      <td id="tdModBitsUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                      <td id="tdModBitsDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Symbols per Sample (Bit)</td>
+                      <td id="tdModSymsUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                      <td id="tdModSymsDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Slicer Decision Levels</td>
+                      <td id="tdModLevelsUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                      <td id="tdModLevelsDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Transmit PSD Base Shape</td>
+                      <td id="tdModPsdUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                      <td id="tdModPsdDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
 
@@ -616,12 +654,35 @@
         connectorSelect.appendChild(opt);
       });
 
+      // Populate Modulation options
+      const modulationUsSelect = document.getElementById('modulationUs');
+      const modulationDsSelect = document.getElementById('modulationDs');
+      const MODULATION_TABLE = window.MODULATION_TABLE || {};
+
+      modulationUsSelect.innerHTML = '';
+      Object.keys(MODULATION_TABLE).forEach(modKey => {
+        const opt = document.createElement('option');
+        opt.value = modKey;
+        opt.textContent = MODULATION_TABLE[modKey].name;
+        if (modKey === (DEFAULT_INPUTS.modulationUs ?? 'PAM4')) opt.selected = true;
+        modulationUsSelect.appendChild(opt);
+      });
+
+      modulationDsSelect.innerHTML = '';
+      Object.keys(MODULATION_TABLE).forEach(modKey => {
+        const opt = document.createElement('option');
+        opt.value = modKey;
+        opt.textContent = MODULATION_TABLE[modKey].name;
+        if (modKey === (DEFAULT_INPUTS.modulationDs ?? 'PAM4')) opt.selected = true;
+        modulationDsSelect.appendChild(opt);
+      });
+
       // 2. Set default input values
       for (const [key, val] of Object.entries(DEFAULT_INPUTS)) {
         const inputField = document.getElementById(key);
         if (inputField) {
           // Do not overwrite dropdown selections set above
-          if (['cableModel', 'pcbModel', 'connectorEchoModel'].includes(key)) continue;
+          if (['cableModel', 'pcbModel', 'connectorEchoModel', 'modulationUs', 'modulationDs'].includes(key)) continue;
           inputField.value = val;
         }
       }
@@ -794,6 +855,18 @@
       document.getElementById('tdCableLossNyq').textContent = `${result.cableLossNyquistDbUs.toFixed(2)} dB`;
       document.getElementById('tdChannelLossNyq').textContent = `${result.channelInsertionLossNyquistDbUs.toFixed(2)} dB`;
       document.getElementById('tdWireEcho').textContent = `${result.wireEchoDb.toFixed(1)} dB`;
+
+      // Modulation specs values
+      document.getElementById('tdModNameUs').textContent = result.modulationUs.name;
+      document.getElementById('tdModNameDs').textContent = result.modulationDs.name;
+      document.getElementById('tdModBitsUs').textContent = result.modulationUs.bitsPerSymbol.toFixed(2);
+      document.getElementById('tdModBitsDs').textContent = result.modulationDs.bitsPerSymbol.toFixed(2);
+      document.getElementById('tdModSymsUs').textContent = result.modulationUs.symbolsPerSample.toFixed(4);
+      document.getElementById('tdModSymsDs').textContent = result.modulationDs.symbolsPerSample.toFixed(4);
+      document.getElementById('tdModLevelsUs').textContent = result.modulationUs.slicerLevels;
+      document.getElementById('tdModLevelsDs').textContent = result.modulationDs.slicerLevels;
+      document.getElementById('tdModPsdUs').textContent = result.modulationUs.psdType;
+      document.getElementById('tdModPsdDs').textContent = result.modulationDs.psdType;
 
       // 4. Update secondary modules
       updateCharts(result);
@@ -1244,7 +1317,7 @@
       <div>Margin: <strong>${lastResult.snrMarginDbUs.toFixed(2)} dB</strong> (${lastResult.snrMarginDbUs >= 0 ? 'PASS' : 'FAIL'})</div>
       <table class="metric-table">
         <tr><td>Data Rate</td><td>${lastResult.input.dataRateGbpsUs} Gbps</td></tr>
-        <tr><td>Modulation</td><td>PAM${lastResult.input.pamUs}</td></tr>
+        <tr><td>Modulation</td><td>${lastResult.modulationUs.name}</td></tr>
         <tr><td>Nyquist Frequency</td><td>${(lastResult.nyquistHzUs / 1e9).toFixed(3)} GHz</td></tr>
         <tr><td>Estimated Slicer SNR</td><td>${lastResult.estimatedSlicerSnrDbUs.toFixed(2)} dB</td></tr>
         <tr><td>Required Slicer SNR</td><td>${lastResult.requiredSlicerSnrDbUs.toFixed(2)} dB</td></tr>
@@ -1256,7 +1329,7 @@
       <div>Margin: <strong>${lastResult.snrMarginDbDs.toFixed(2)} dB</strong> (${lastResult.snrMarginDbDs >= 0 ? 'PASS' : 'FAIL'})</div>
       <table class="metric-table">
         <tr><td>Data Rate</td><td>${lastResult.input.dataRateGbpsDs} Gbps</td></tr>
-        <tr><td>Modulation</td><td>PAM${lastResult.input.pamDs}</td></tr>
+        <tr><td>Modulation</td><td>${lastResult.modulationDs.name}</td></tr>
         <tr><td>Nyquist Frequency</td><td>${(lastResult.nyquistHzDs / 1e9).toFixed(3)} GHz</td></tr>
         <tr><td>Estimated Slicer SNR</td><td>${lastResult.estimatedSlicerSnrDbDs.toFixed(2)} dB</td></tr>
         <tr><td>Required Slicer SNR</td><td>${lastResult.requiredSlicerSnrDbDs.toFixed(2)} dB</td></tr>
