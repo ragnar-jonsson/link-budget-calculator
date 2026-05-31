@@ -1,6 +1,6 @@
 # Link Budget Calculator
 
-An interactive, link budget calculator based on Salz SNR calcultions and channel insertion loss models. This application provides interactive transmission line SNR calculations for modulations like **IEEE 802.3ch** (Multi-Gig Automotive Ethernet) and **IEEE 802.3cy** (25G Automotive Ethernet).
+An interactive, link budget calculator based on Salz SNR calculations and channel insertion loss models. This application provides interactive transmission line SNR calculations for standards like **IEEE 802.3ch** (Multi-Gig Automotive Ethernet), **IEEE 802.3cy** (25G Automotive Ethernet), and **IEEE 802.3dm** (Asymmetrical Automotive Ethernet).
 
 ---
 
