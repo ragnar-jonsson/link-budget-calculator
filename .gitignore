@@ -1,0 +1,11 @@
+# Editor and build files
+.vs/
+.vscode/
+
+# Excel temporary files
+~$*.xlsx
+
+# Local environment/debug files
+*.log
+extract.ps1
+extract_thinking.ps1

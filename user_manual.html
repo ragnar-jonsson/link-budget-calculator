@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Link Budget Simulator | Interactive User Manual</title>
+  <link rel="stylesheet" href="index.css">
+  <style>
+    /* Manual Page Custom Adjustments */
+    :root {
+      --sidebar-width: 280px;
+    }
+    
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+    }
+    
+    .manual-layout {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      min-height: calc(100vh - 70px);
+      max-width: 1700px;
+      margin: 0 auto;
+      position: relative;
+    }
+    
+    /* Left Sidebar Navigation */
+    .manual-sidebar {
+      background-color: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem;
+      position: sticky;
+      top: 70px;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .sidebar-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .sidebar-menu a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      display: block;
+      transition: var(--transition);
+    }
+    
+    .sidebar-menu a:hover,
+    .sidebar-menu li.active a {
+      color: white;
+      background-color: var(--bg-input);
+    }
+    
+    .sidebar-menu li.active a {
+      border-left: 3px solid var(--primary);
+      padding-left: calc(0.75rem - 3px);
+      font-weight: 600;
+    }
+    
+    /* Main Content Styling */
+    .manual-content {
+      padding: 2.5rem;
+      overflow-y: auto;
+      max-width: 1000px;
+    }
+    
+    .manual-section {
+      margin-bottom: 3.5rem;
+      scroll-margin-top: 100px;
+    }
+    
+    .manual-section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin-bottom: 1.25rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    
+    .manual-section h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+    }
+    
+    .manual-section p {
+      margin-bottom: 1rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    
+    .manual-section ul, .manual-section ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    
+    .manual-section li {
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Highlight Boxes */
+    .info-callout {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+    }
+    
+    .info-callout h4 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: white;
+    }
+    
+    .info-callout-us {
+      border-left-color: var(--us-color);
+      background-color: rgba(139, 92, 246, 0.03);
+    }
+    
+    .info-callout-ds {
+      border-left-color: var(--ds-color);
+      background-color: rgba(6, 182, 212, 0.03);
+    }
+    
+    /* Searchable Table Styles */
+    .search-container {
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+    
+    .search-container input {
+      padding-left: 2.25rem;
+    }
+    
+    .search-container .search-icon {
+      position: absolute;
+      left: 0.875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1rem;
+      height: 1rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    
+    .manual-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1.5rem 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    
+    .manual-table th, .manual-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    .manual-table th {
+      background-color: var(--bg-input);
+      color: white;
+      font-weight: 700;
+    }
+    
+    .manual-table td code {
+      background-color: var(--bg-input);
+      padding: 0.125rem 0.375rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      color: var(--primary);
+    }
+    
+    .manual-table tr:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    
+    /* Responsive Media Queries */
+    @media (max-width: 900px) {
+      .manual-layout {
+        grid-template-columns: 1fr;
+      }
+      .manual-sidebar {
+        display: none; /* Can toggle or hide in small screens */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 12h2.5l1.5-4.5 2 9 1.5-6.5 1.5 4.5 1.5-2.5h2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>Link Budget Simulator</h1>
+        <p>User Manual & Technical Documentation</p>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div class="badge-version">v1.2.0 (IEEE 802.3ch / 3cy)</div>
+      <a href="index.html" class="action-btn-sm" style="text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
+        <!-- Return back icon -->
+        <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Open Simulator
+      </a>
+    </div>
+  </header>
+
+  <!-- Application Layout -->
+  <div class="manual-layout">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="manual-sidebar">
+      <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em;">Manual Sections</div>
+      <ul class="sidebar-menu">
+        <li class="active"><a href="#sectionIntro">1. Introduction & Overview</a></li>
+        <li><a href="#sectionMath">2. Technical & Math Core</a></li>
+        <li><a href="#sectionParams">3. Parameter Dictionary</a></li>
+        <li><a href="#sectionOutputs">4. Dashboard Indicators</a></li>
+        <li><a href="#sectionCharts">5. Waveform Charts</a></li>
+        <li><a href="#sectionFeatures">6. Advanced Functions</a></li>
+      </ul>
+      <div class="info-callout" style="margin: 0; padding: 0.875rem; font-size: 0.75rem;">
+        <h4>Need Quick Help?</h4>
+        <p style="font-size: 0.75rem; margin: 0; line-height: 1.4;">Hover over parameters in the simulator sidebar to display built-in tooltips directly.</p>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="manual-content">
+      
+      <!-- Section 1: Intro -->
+      <section class="manual-section" id="sectionIntro">
+        <h2>1. Introduction & Overview</h2>
+        <p>
+          Welcome to the <strong>Link Budget Simulator</strong> (Version 1.2.0) User Manual. This application is a web-based, baseband channel capacity simulation dashboard designed for hardware design and transmission engineering validation.
+        </p>
+        <p>
+          The simulator is designed to evaluate high-speed automotive communication standards over physical cable models, specifically adhering to guidelines within:
+        </p>
+        <ul>
+          <li><strong>IEEE 802.3ch</strong> (Multi-Gigabit Automotive Copper Physical Layer Solutions - e.g., 2.5 Gbps, 5 Gbps, and 10 Gbps).</li>
+          <li><strong>IEEE 802.3cy</strong> (Greater than 10 Gbps Electrical Alternative Physical Layer - e.g., 25 Gbps, 50 Gbps, and 100 Gbps Solutions over Coaxial and Shielded Differential Pairs).</li>
+        </li>
+        </ul>
+        <p>
+          The core simulator models signal attenuation, PCB trace degradation, transmit power masks, connector profiles, wire and reflection echoes, echo cancellation, AFE noise, and Forward Error Correction (FEC) algorithms to verify the overall **SNR Margin** of a link.
+        </p>
+      </section>
+
+      <!-- Section 2: Mathematical Core -->
+      <section class="manual-section" id="sectionMath">
+        <h2>2. Technical & Math Core</h2>
+        <p>
+          The simulation engine evaluates the channel capacity by dividing the evaluation grid frequency band (from 0 up to <code>Max Frequency</code>) into discrete linear steps of size <code>fStepHz = fMaxHz / nSteps</code>. At each frequency step, it performs the following transmission line calculations:
+        </p>
+
+        <h3>2.1 Channel Insertion Loss Model (IL)</h3>
+        <p>
+          The cable insertion loss per meter is evaluated using physical fit constants ($b_0$, $b_1$, $p$, and the temperature coefficient $drho$):
+        </p>
+        <div style="font-family: var(--font-mono); background-color: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem; margin-bottom: 1rem;">
+          IL_per_meter(f) = b0 * [(1 + drho * (T - 20)) * f]^p + b1 * f
+        </div>
+        <p>
+          The total loss at any step frequency includes the cable attenuation ($IL_{cable} \times CableLength$) plus the PCB trace attenuation ($IL_{pcb} \times PCBLength$).
+        </p>
+
+        <h3>2.2 Echo Contributions & Noise Model</h3>
+        <p>
+          The simulator models echo interference from connector interfaces and reflections along the wire:
+        </p>
+        <ul>
+          <li><strong>Connector Echo Profile</strong>: Modeled via connector constant $C_0$ scaled by inline connector count and step frequency.</li>
+          <li><strong>Residual Echo</strong>: Residual echo values are computed after applying Upstream and Downstream connector and reflection echo cancellation bounds (e.g. <code>connectorEchoCancellationDb</code> and <code>cableReflectionEchoCancellationDb</code>).</li>
+          <li><strong>Noise Floor</strong>: Total linear noise at each step is the sum of AFE thermal noise density and residual echo noise power.</li>
+        </ul>
+
+        <h3>2.3 Slicer SNR Margin</h3>
+        <p>
+          The theoretical Slicer SNR is the weighted in-band average SNR calculated across the evaluated Nyquist band:
+        </p>
+        <div style="font-family: var(--font-mono); background-color: var(--bg-card); padding: 0.75rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.85rem; margin-bottom: 1rem;">
+          SNR_Theoretical = Integral_from_0_to_Nyquist( SNR(f) * df ) / NyquistFrequency
+        </div>
+        <p>
+          The <strong>Estimated Slicer SNR</strong> is then computed as the theoretical SNR minus the specified transceiver Implementation Loss. The **SNR Margin** displays the excess SNR available over the Required Slicer SNR (which is determined by target BER, PAM level, and FEC coding capability). A positive margin (margin &ge; 0 dB) results in a **PASS**, while a negative margin results in a **FAIL**.
+        </p>
+      </section>
+
+      <!-- Section 3: Parameter Dictionary -->
+      <section class="manual-section" id="sectionParams">
+        <h2>3. Parameter Dictionary</h2>
+        <p>
+          This searchable list displays all configuration settings available in the simulator window's parameter panels. Use the search box below to filter inputs instantly.
+        </p>
+
+        <!-- Dynamic Table Search -->
+        <div class="search-container">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="manualParamSearch" class="search-input" placeholder="Search configuration parameters...">
+        </div>
+
+        <table class="manual-table" id="paramTable">
+          <thead>
+            <tr>
+              <th style="width: 25%;">Parameter ID</th>
+              <th style="width: 15%;">Default Value</th>
+              <th style="width: 60%;">Description & Usage Rules</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>dataRateGbpsUs</code></td>
+              <td>25 Gbps</td>
+              <td>Upstream transmission speed. Determines Nyquist and symbol rate bounds for the upstream channel.</td>
+            </tr>
+            <tr>
+              <td><code>dataRateGbpsDs</code></td>
+              <td>25 Gbps</td>
+              <td>Downstream transmission speed. Determines Nyquist and symbol rate bounds for the downstream channel.</td>
+            </tr>
+            <tr>
+              <td><code>cableLengthM</code></td>
+              <td>11 m</td>
+              <td>Physical length of the coaxial or differential link cable in meters. Scales the cable insertion loss.</td>
+            </tr>
+            <tr>
+              <td><code>numberOfConnectors</code></td>
+              <td>4</td>
+              <td>Total number of inline connector interfaces on the link. Scales the connector-induced echo profile.</td>
+            </tr>
+            <tr>
+              <td><code>cableModel</code></td>
+              <td>mueller_3cy_01_12_01_20_sdp</td>
+              <td>Cable model profile. Selects $b_0$, $b_1$, $p$, and $drho$ constants from the 802.3cy/ch database.</td>
+            </tr>
+            <tr>
+              <td><code>connectorEchoModel</code></td>
+              <td>Hard</td>
+              <td>Selects the connector quality coefficient ($C_0$): Bad ($7.5 \times 10^{-11}$), Hard ($1.7 \times 10^{-11}$), Good ($1.0 \times 10^{-12}$), Easy ($1.0 \times 10^{-14}$).</td>
+            </tr>
+            <tr>
+              <td><code>pamUs</code> / <code>pamDs</code></td>
+              <td>4</td>
+              <td>Pulse Amplitude Modulation levels. Determines bits per symbol (e.g. 2 = NRZ, 4 = PAM4, etc.) for Upstream/Downstream.</td>
+            </tr>
+            <tr>
+              <td><code>txPowerDbmUs</code> / <code>txPowerDbmDs</code></td>
+              <td>0 dBm</td>
+              <td>Target transmit power level in decibel-milliwatts. Scales the amplitude of the transmit PSD.</td>
+            </tr>
+            <tr>
+              <td><code>psdMaskUs</code> / <code>psdMaskDs</code></td>
+              <td>PSD_ZOH</td>
+              <td>Transmit PSD shaping rule. Options: ZOH (Zero-Order Hold), brick (brick wall), Butterworth filter, eq149-14, eq149-22.</td>
+            </tr>
+            <tr>
+              <td><code>targetBer</code></td>
+              <td>1e-12</td>
+              <td>Target Bit Error Rate threshold. Determines required slicer SNR in conjunction with FEC algorithms.</td>
+            </tr>
+            <tr>
+              <td><code>fecBlockSizeUs</code> / <code>fecBlockSizeDs</code></td>
+              <td>360</td>
+              <td>Forward Error Correction total block size symbol length (N).</td>
+            </tr>
+            <tr>
+              <td><code>fecDataSizeUs</code> / <code>fecDataSizeDs</code></td>
+              <td>326</td>
+              <td>Forward Error Correction data symbol payload length (K).</td>
+            </tr>
+            <tr>
+              <td><code>fecCorrectionEfficiencyUs</code> / <code>fecCorrectionEfficiencyDs</code></td>
+              <td>1.0</td>
+              <td>Scaling coefficient modeling correction efficiency (0.0 to 1.0).</td>
+            </tr>
+            <tr>
+              <td><code>tddDutyCycleUs</code> / <code>tddDutyCycleDs</code></td>
+              <td>1.0</td>
+              <td>Time Division Duplexing (TDD) duty cycle fraction (0.01 to 1.0) representing active transmission windows. Reducing below 1.0 increases baud rate to compensate.</td>
+            </tr>
+            <tr>
+              <td><code>framingOverhead</code></td>
+              <td>0.01875 (1.875%)</td>
+              <td>Coding and formatting overhead ratio, scaling required line baud rates.</td>
+            </tr>
+            <tr>
+              <td><code>temperatureC</code></td>
+              <td>20 °C</td>
+              <td>Operational cable temperature in Celsius. Interacts with the $drho$ coefficient to scale insertion losses.</td>
+            </tr>
+            <tr>
+              <td><code>pcbModel</code></td>
+              <td>pcb_kadry_3cy_02_0820</td>
+              <td>PCB trace model profile, determining insertion loss coefficients for terminal PCB routing.</td>
+            </tr>
+            <tr>
+              <td><code>pcbTraceLengthM</code></td>
+              <td>0.0762 m</td>
+              <td>Total length of terminal PCB traces in meters.</td>
+            </tr>
+            <tr>
+              <td><code>wireReflectionLimit</code></td>
+              <td>jonsson*12_08_20</td>
+              <td>Selects the baseline limit rule for return loss / wire reflections.</td>
+            </tr>
+            <tr>
+              <td><code>afeNoiseDbmPerHzUs</code> / <code>afeNoiseDbmPerHzDs</code></td>
+              <td>-140 dBm/Hz</td>
+              <td>Analog Front End thermal noise spectral density. Sets the base receiver noise floor.</td>
+            </tr>
+            <tr>
+              <td><code>connectorEchoCancellationDbUs</code> / <code>connectorEchoCancellationDbDs</code></td>
+              <td>50 dB</td>
+              <td>Connector echo cancellation capability (in dB) implemented in the digital signal processor (DSP).</td>
+            </tr>
+            <tr>
+              <td><code>cableReflectionEchoCancellationDbUs</code> / <code>cableReflectionEchoCancellationDbDs</code></td>
+              <td>6 dB</td>
+              <td>Cable reflection return loss echo cancellation capability (in dB) implemented in the DSP.</td>
+            </tr>
+            <tr>
+              <td><code>implementationLossDbUs</code> / <code>implementationLossDbDs</code></td>
+              <td>5 dB</td>
+              <td>Implementation margin subtraction (in dB) representing hardware non-idealities (quantization, jitter, etc.).</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Section 4: Outputs -->
+      <section class="manual-section" id="sectionOutputs">
+        <h2>4. Dashboard Indicators</h2>
+        <p>
+          The simulator outputs results across several high-visibility dashboards:
+        </p>
+        
+        <h3>4.1 Summary Metric Cards</h3>
+        <p>
+          Positioned at the top of the results panel, these cards provide immediate visibility:
+        </p>
+        <ul>
+          <li><strong>SNR Margin (dB)</strong>: Displays the computed margin. Highlighted with a violet background for **Upstream** and a cyan background for **Downstream**. A **PASS** (green badge) indicates sufficient margins, while **FAIL** (red badge) indicates degradation below the BER target.</li>
+          <li><strong>Nyquist (GHz)</strong>: Displays the Nyquist frequency limit of the signal.</li>
+          <li><strong>Est / Req (dB)</strong>: Shows the side-by-side comparison of the Estimated Slicer SNR vs. the Required Slicer SNR.</li>
+        </ul>
+
+        <h3>4.2 Detailed Budget Tab</h3>
+        <p>
+          Shows an exact comparison grid of the parameters, detailing intermediate variables such as:
+        </p>
+        <ul>
+          <li><strong>Baud Rate (GBaud)</strong>: The actual line rate in gigasymbols per second.</li>
+          <li><strong>FEC correction capability (t)</strong>: Calculated error correction symbols, computed as <code>t = Math.floor(((N - K) / 2) * efficiency)</code>.</li>
+          <li><strong>Theoretical vs. Estimated Slicer SNR</strong>: Displays the influence of transceiver Implementation Loss.</li>
+          <li><strong>Cable & PCB Loss at Nyquist</strong>: Breakdowns of attenuation levels measured exactly at the channel's Nyquist frequency.</li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Waveform Charts -->
+      <section class="manual-section" id="sectionCharts">
+        <h2>5. Waveform Charts</h2>
+        <p>
+          The **Charts & Profiles** tab renders high-resolution interactive plots powered by Chart.js.
+        </p>
+        <h3>5.1 Chart Variants</h3>
+        <ol>
+          <li><strong>SNR Profile</strong>: Plots the Signal-to-Noise Ratio (in dB) across the frequency sweep.</li>
+          <li><strong>Insertion Loss Profiles</strong>: Displays three curves: Cable Insertion Loss, PCB Insertion Loss, and Total Channel Insertion Loss.</li>
+          <li><strong>Transmit PSD</strong>: Visualizes the power spectral density mask profiles (in dBm/Hz) for the upstream and downstream signal paths.</li>
+        </ol>
+
+        <div class="info-callout">
+          <h4>Y-Axis Span Capping Rule</h4>
+          <p style="margin: 0; line-height: 1.5;">
+            To prevent extreme attenuation values (e.g. at high frequencies or long cables) from compressing the visible region of the chart, the simulator enforces a **maximum Y-axis range span of 150 dB**. If the data span exceeds 150 dB, the minimum display value is capped at <code>max - 150</code>, keeping peak profiles fully visible.
+          </p>
+        </div>
+
+        <div class="info-callout info-callout-ds">
+          <h4>Linear X-Axis Tick Marks</h4>
+          <p style="margin: 0; line-height: 1.5;">
+            The frequency x-axis runs on a continuous linear scale (GHz). Chart.js automatically computes nice, rounded numbers (like 1, 2, 3... GHz) for the axes, preventing cluttered tick labels with excess digits. Hovering over a chart displays precise tooltips formatted to 3 decimal places.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 6: Advanced Functions -->
+      <section class="manual-section" id="sectionFeatures">
+        <h2>6. Advanced Functions</h2>
+        
+        <h3>6.1 Backup & Config JSON</h3>
+        <p>
+          The **JSON Config** tab allows developers to inspect, export, or restore simulator states:
+        </p>
+        <ul>
+          <li><strong>Save Config</strong>: Downloads a <code>.json</code> file containing the current input parameters values.</li>
+          <li><strong>Load Config</strong>: Opens the browser's file examiner to upload a previously saved <code>.json</code> configuration. The simulator will automatically parse the file, populate the inputs fields, and run a simulation recalculation.</li>
+          <li><strong>Copy to Clipboard</strong>: Copies the full JSON summary results (including calculated Baud, margins, and intermediate values) for integration into external data pipelines.</li>
+        </ul>
+
+        <h3>6.2 Print-Ready Simulation Reports</h3>
+        <p>
+          Clicking the **Generate Report** button (positioned next to the version badge in the navigation header) performs the following automated steps:
+        </p>
+        <ol>
+          <li><strong>Offscreen Compilation</strong>: Instantiates a temporary, hidden Chart.js context to draw SNR, Insertion Loss, and Transmit PSD profiles in a high-contrast, light-themed format suitable for printing.</li>
+          <li><strong>Waveform Extraction</strong>: Extracts base64 image strings from the offscreen canvases.</li>
+          <li><strong>Standalone Document Assembly</strong>: Compiles a print-friendly HTML document incorporating the date metadata, standard introductory notices, configuration summaries, performance grids, PASS/FAIL cards, and the embedded chart images.</li>
+          <li><strong>Download Trigger</strong>: Initiates a browser download for the compiled standalone HTML file.</li>
+        </ol>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    'use strict';
+    
+    // Highlight Active Sidebar Section on Scroll (ScrollSpy)
+    window.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.manual-section');
+      const menuItems = document.querySelectorAll('.sidebar-menu li');
+      const scrollContainer = document.querySelector('.manual-content') || window;
+      
+      function checkActiveSection() {
+        let currentActive = '';
+        
+        sections.forEach(section => {
+          const rect = section.getBoundingClientRect();
+          // Offset to trigger earlier
+          if (rect.top <= 150) {
+            currentActive = section.getAttribute('id');
+          }
+        });
+        
+        if (!currentActive && sections.length > 0) {
+          currentActive = sections[0].getAttribute('id');
+        }
+        
+        menuItems.forEach(item => {
+          item.classList.remove('active');
+          const link = item.querySelector('a');
+          if (link && link.getAttribute('href') === `#${currentActive}`) {
+            item.classList.add('active');
+          }
+        });
+      }
+      
+      // Listen on scroll events
+      window.addEventListener('scroll', checkActiveSection);
+      checkActiveSection();
+      
+      // Interactive Search Filter for Parameter Dictionary Table
+      const searchInput = document.getElementById('manualParamSearch');
+      const paramTableRows = document.querySelectorAll('#paramTable tbody tr');
+      
+      searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase().trim();
+        
+        paramTableRows.forEach(row => {
+          const cells = row.querySelectorAll('td');
+          const paramId = cells[0].textContent.toLowerCase();
+          const description = cells[2].textContent.toLowerCase();
+          
+          if (paramId.includes(query) || description.includes(query)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

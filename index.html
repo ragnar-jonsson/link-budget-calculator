@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Channel Capacity Simulator | Multi-Gigabit Link Budget Analyzer</title>
+  <link rel="stylesheet" href="index.css">
+  <!-- Chart.js CDN for visual data representation -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-icon">
+        <!-- SVG Waveform Icon representing frequency response -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15.92h-2v-2h2v2zm0-4h-2V7h2v6.92z" style="display:none;"/>
+          <path d="M4 12h2.5l1.5-4.5 2 9 1.5-6.5 1.5 4.5 1.5-2.5h2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>Link Budget Simulator</h1>
+        <p>Baseband Channel Capacity Calculator</p>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <div class="badge-version">--</div>
+      <a href="user_manual.html" class="action-btn-sm" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; text-decoration: none; display: inline-flex; align-items: center;">
+        <!-- SVG book/help icon -->
+        <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        User Manual
+      </a>
+      <button class="action-btn-sm" id="btnGenReport" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem;">
+        <!-- SVG report icon -->
+        <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Generate Report
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Application Layout -->
+  <div class="app-container">
+
+    <!-- Left Column: Simulation Inputs Form -->
+    <aside class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        Simulation Parameters
+      </div>
+
+      <form id="configForm">
+        
+        <!-- Core Parameters -->
+        <div class="form-section-title">Core Link Configuration</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="dataRateGbpsUs" title="Upstream data transmission speed in Gbps">Upstream Speed</label>
+            <input type="number" id="dataRateGbpsUs" name="dataRateGbpsUs" min="1" max="100" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="dataRateGbpsDs" title="Downstream data transmission speed in Gbps">Downstream Speed</label>
+            <input type="number" id="dataRateGbpsDs" name="dataRateGbpsDs" min="1" max="100" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="cableLengthM" title="Physical length of the coaxial/differential cable in meters">Cable Length (m)</label>
+            <input type="number" id="cableLengthM" name="cableLengthM" min="0.1" max="50" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="numberOfConnectors" title="Total number of inline connector interfaces on the link">Connectors</label>
+            <input type="number" id="numberOfConnectors" name="numberOfConnectors" min="0" max="10" step="1">
+          </div>
+          <div class="form-group full-width">
+            <label for="cableModel">Cable Model</label>
+            <select id="cableModel" name="cableModel"></select>
+          </div>
+          <div class="form-group full-width">
+            <label for="connectorEchoModel">Connector Echo Profile</label>
+            <select id="connectorEchoModel" name="connectorEchoModel"></select>
+          </div>
+        </div>
+
+        <!-- Slicer and Transceiver settings -->
+        <div class="form-section-title">Transceiver & Modulation</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="pamUs" title="Pulse Amplitude Modulation level for upstream (2 = NRZ, 4 = PAM4, etc.)">Upstream PAM</label>
+            <input type="number" id="pamUs" name="pamUs" min="2" max="16" step="2">
+          </div>
+          <div class="form-group">
+            <label for="pamDs" title="Pulse Amplitude Modulation level for downstream (2 = NRZ, 4 = PAM4, etc.)">Downstream PAM</label>
+            <input type="number" id="pamDs" name="pamDs" min="2" max="16" step="2">
+          </div>
+          <div class="form-group">
+            <label for="txPowerDbmUs" title="Upstream transmit power in decibel-milliwatts">Tx Power US (dBm)</label>
+            <input type="number" id="txPowerDbmUs" name="txPowerDbmUs" min="-20" max="20" step="0.5">
+          </div>
+          <div class="form-group">
+            <label for="txPowerDbmDs" title="Downstream transmit power in decibel-milliwatts">Tx Power DS (dBm)</label>
+            <input type="number" id="txPowerDbmDs" name="txPowerDbmDs" min="-20" max="20" step="0.5">
+          </div>
+          <div class="form-group">
+            <label for="psdMaskUs" title="Power Spectral Density shape rule for upstream">PSD Mask US</label>
+            <select id="psdMaskUs" name="psdMaskUs">
+              <option value="PSD_ZOH">PSD_ZOH</option>
+              <option value="PSD_brick">PSD_brick</option>
+              <option value="eq149-14">eq149-14</option>
+              <option value="eq149-22">eq149-22</option>
+              <option value="Butterworth">Butterworth</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="psdMaskDs" title="Power Spectral Density shape rule for downstream">PSD Mask DS</label>
+            <select id="psdMaskDs" name="psdMaskDs">
+              <option value="PSD_ZOH">PSD_ZOH</option>
+              <option value="PSD_brick">PSD_brick</option>
+              <option value="eq149-14">eq149-14</option>
+              <option value="eq149-22">eq149-22</option>
+              <option value="Butterworth">Butterworth</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Collapsible Details for advanced config -->
+        <details>
+          <summary>Advanced Simulator Config</summary>
+          <div class="details-content">
+            <div class="form-grid" style="margin-top: 0.75rem;">
+              <div class="form-group full-width">
+                <label for="targetBer" title="Target Bit Error Rate threshold">Target BER</label>
+                <input type="text" id="targetBer" name="targetBer">
+              </div>
+              <div class="form-section-title" style="grid-column: span 2; margin-top: 0.5rem; font-size: 0.75rem;">Upstream FEC (US)</div>
+              <div class="form-group">
+                <label for="fecBlockSizeUs" title="FEC Block total symbol length (N) for Upstream">FEC Block US (N)</label>
+                <input type="number" id="fecBlockSizeUs" name="fecBlockSizeUs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecDataSizeUs" title="FEC payload symbol length (K) for Upstream">FEC Data US (K)</label>
+                <input type="number" id="fecDataSizeUs" name="fecDataSizeUs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecCorrectionEfficiencyUs" title="Correction efficiency for Upstream">Correction Eff. US</label>
+                <input type="number" id="fecCorrectionEfficiencyUs" name="fecCorrectionEfficiencyUs" min="0" max="1" step="0.05">
+              </div>
+              <div class="form-group">
+                <label for="fecBitsPerSymbolUs" title="Bits per symbol for Upstream">Bits/Sym US</label>
+                <input type="number" id="fecBitsPerSymbolUs" name="fecBitsPerSymbolUs" min="1" step="1">
+              </div>
+
+              <div class="form-section-title" style="grid-column: span 2; margin-top: 0.5rem; font-size: 0.75rem;">Downstream FEC (DS)</div>
+              <div class="form-group">
+                <label for="fecBlockSizeDs" title="FEC Block total symbol length (N) for Downstream">FEC Block DS (N)</label>
+                <input type="number" id="fecBlockSizeDs" name="fecBlockSizeDs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecDataSizeDs" title="FEC payload symbol length (K) for Downstream">FEC Data DS (K)</label>
+                <input type="number" id="fecDataSizeDs" name="fecDataSizeDs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecCorrectionEfficiencyDs" title="Correction efficiency for Downstream">Correction Eff. DS</label>
+                <input type="number" id="fecCorrectionEfficiencyDs" name="fecCorrectionEfficiencyDs" min="0" max="1" step="0.05">
+              </div>
+              <div class="form-group">
+                <label for="fecBitsPerSymbolDs" title="Bits per symbol for Downstream">Bits/Sym DS</label>
+                <input type="number" id="fecBitsPerSymbolDs" name="fecBitsPerSymbolDs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="tddDutyCycleUs" title="Time Division Duplexing (TDD) Upstream duty cycle (0 to 1)">TDD Duty Cycle US</label>
+                <input type="number" id="tddDutyCycleUs" name="tddDutyCycleUs" min="0.01" max="1" step="0.01">
+              </div>
+              <div class="form-group">
+                <label for="tddDutyCycleDs" title="Time Division Duplexing (TDD) Downstream duty cycle (0 to 1)">TDD Duty Cycle DS</label>
+                <input type="number" id="tddDutyCycleDs" name="tddDutyCycleDs" min="0.01" max="1" step="0.01">
+              </div>
+              <div class="form-group">
+                <label for="framingOverhead" title="Coding overhead margin">Framing Overhead</label>
+                <input type="number" id="framingOverhead" name="framingOverhead" min="0" max="0.5" step="0.001">
+              </div>
+              <div class="form-group">
+                <label for="temperatureC" title="Operational temperature of the cable in degrees Celsius">Temperature (°C)</label>
+                <input type="number" id="temperatureC" name="temperatureC" min="-40" max="125" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fMaxHz" title="Maximum evaluation grid frequency in Hz">Max Freq (Hz)</label>
+                <input type="text" id="fMaxHz" name="fMaxHz">
+              </div>
+              <div class="form-group">
+                <label for="nSteps" title="Resolution grid step size">Freq Steps</label>
+                <input type="number" id="nSteps" name="nSteps" min="10" max="1000" step="10">
+              </div>
+              <div class="form-group full-width">
+                <label for="pcbModel">PCB Trace Model</label>
+                <select id="pcbModel" name="pcbModel"></select>
+              </div>
+              <div class="form-group">
+                <label for="pcbTraceLengthM">PCB Length (m)</label>
+                <input type="number" id="pcbTraceLengthM" name="pcbTraceLengthM" min="0" max="1" step="0.0001">
+              </div>
+              <div class="form-group">
+                <label for="wireReflectionLimit">Reflection Limit</label>
+                <select id="wireReflectionLimit" name="wireReflectionLimit">
+                  <option value="jonsson*12_08_20">jonsson*12_08_20</option>
+                  <option value="jonsson*10_14_20">jonsson*10_14_20</option>
+                  <option value="jonsson_3cy_02_03_15_21">jonsson_3cy_02_03_15_21</option>
+                  <option value="custom_rule">custom_rule</option>
+                  <option value="custom_rule2">custom_rule2</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="afeNoiseDbmPerHzUs" title="AFE noise spectral density in dBm/Hz for upstream">AFE Noise US (dBm/Hz)</label>
+                <input type="number" id="afeNoiseDbmPerHzUs" name="afeNoiseDbmPerHzUs" min="-180" max="-100" step="1">
+              </div>
+              <div class="form-group">
+                <label for="afeNoiseDbmPerHzDs" title="AFE noise spectral density in dBm/Hz for downstream">AFE Noise DS (dBm/Hz)</label>
+                <input type="number" id="afeNoiseDbmPerHzDs" name="afeNoiseDbmPerHzDs" min="-180" max="-100" step="1">
+              </div>
+              <div class="form-group">
+                <label for="connectorEchoCancellationDbUs">Conn Echo Canc US</label>
+                <input type="number" id="connectorEchoCancellationDbUs" name="connectorEchoCancellationDbUs" min="0" max="120" step="1">
+              </div>
+              <div class="form-group">
+                <label for="connectorEchoCancellationDbDs">Conn Echo Canc DS</label>
+                <input type="number" id="connectorEchoCancellationDbDs" name="connectorEchoCancellationDbDs" min="0" max="120" step="1">
+              </div>
+              <div class="form-group">
+                <label for="cableReflectionEchoCancellationDbUs">Refl Echo Canc US</label>
+                <input type="number" id="cableReflectionEchoCancellationDbUs" name="cableReflectionEchoCancellationDbUs" min="0" max="60" step="1">
+              </div>
+              <div class="form-group">
+                <label for="cableReflectionEchoCancellationDbDs">Refl Echo Canc DS</label>
+                <input type="number" id="cableReflectionEchoCancellationDbDs" name="cableReflectionEchoCancellationDbDs" min="0" max="60" step="1">
+              </div>
+              <div class="form-group">
+                <label for="implementationLossDbUs">Impl. Loss US (dB)</label>
+                <input type="number" id="implementationLossDbUs" name="implementationLossDbUs" min="0" max="20" step="0.5">
+              </div>
+              <div class="form-group">
+                <label for="implementationLossDbDs">Impl. Loss DS (dB)</label>
+                <input type="number" id="implementationLossDbDs" name="implementationLossDbDs" min="0" max="20" step="0.5">
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <button type="button" class="btn" id="computeButton">
+          <!-- Play icon representing execution -->
+          <svg style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          Run Link Simulation
+        </button>
+      </form>
+    </aside>
+
+    <!-- Right Column: Visual Dashboard Results -->
+    <main class="results-panel">
+      
+      <!-- Key Stat Cards -->
+      <section class="summary-grid">
+        
+        <!-- Upstream Margin Card -->
+        <div class="metric-card upstream">
+          <div class="metric-info">
+            <span class="metric-label">Upstream SNR Margin</span>
+            <span class="metric-value" id="valMarginUs">-- dB</span>
+            <div class="sub-metrics">
+              <div class="sub-metric-item">
+                <span>Nyquist</span>
+                <span id="valNyqUs">-- GHz</span>
+              </div>
+              <div class="sub-metric-item">
+                <span>Est / Req</span>
+                <span id="valEstReqUs">-- / -- dB</span>
+              </div>
+            </div>
+          </div>
+          <div class="metric-badge" id="badgeUs">--</div>
+        </div>
+
+        <!-- Downstream Margin Card -->
+        <div class="metric-card downstream">
+          <div class="metric-info">
+            <span class="metric-label">Downstream SNR Margin</span>
+            <span class="metric-value" id="valMarginDs">-- dB</span>
+            <div class="sub-metrics">
+              <div class="sub-metric-item">
+                <span>Nyquist</span>
+                <span id="valNyqDs">-- GHz</span>
+              </div>
+              <div class="sub-metric-item">
+                <span>Est / Req</span>
+                <span id="valEstReqDs">-- / -- dB</span>
+              </div>
+            </div>
+          </div>
+          <div class="metric-badge" id="badgeDs">--</div>
+        </div>
+
+      </section>
+
+      <!-- Detailed Analysis Tabbed Container -->
+      <section class="card" style="flex: 1;">
+        <div class="tabs-container">
+          <div class="tab-list">
+            <button class="tab-btn active" data-tab="tabCharts">Charts & Profiles</button>
+            <button class="tab-btn" data-tab="tabBudget">Detailed Budget</button>
+            <button class="tab-btn" data-tab="tabTable">Frequency Grid</button>
+            <button class="tab-btn" data-tab="tabJson">JSON Config</button>
+          </div>
+
+          <!-- Tab: Interactive Charts -->
+          <div class="tab-panel active" id="tabCharts">
+            <div class="chart-controls">
+              <button class="chart-toggle-btn active" data-chart="snr">SNR Profile</button>
+              <button class="chart-toggle-btn" data-chart="loss">Insertion Loss Profiles</button>
+              <button class="chart-toggle-btn" data-chart="psd">Transmit PSD</button>
+            </div>
+            <div class="chart-wrapper" id="chartWrapper">
+              <canvas id="chartCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Tab: Budget Table Comparison -->
+          <div class="tab-panel" id="tabBudget">
+            <div class="budget-grid">
+              <div>
+                <table class="budget-table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Upstream Link Budget Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Nyquist Frequency</td>
+                      <td id="tdNyqUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Symbol Rate (Baud)</td>
+                      <td id="tdBaudUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>FEC Config (N, K)</td>
+                      <td id="tdFecUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Theoretical Slicer SNR</td>
+                      <td id="tdTheoSnrUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Implementation Loss</td>
+                      <td id="tdImplLossUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr class="highlight">
+                      <td>Estimated Slicer SNR</td>
+                      <td id="tdEstSnrUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                      <td>Required Slicer SNR</td>
+                      <td id="tdReqSnrUs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr class="highlight" style="font-size: 0.9rem;">
+                      <td>SNR Margin</td>
+                      <td id="tdMarginUs" style="text-align: right; font-family: var(--font-mono); font-weight: 700;">--</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div>
+                <table class="budget-table">
+                  <thead>
+                    <tr>
+                      <th colspan="3">Downstream Link Budget Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Nyquist Frequency</td>
+                      <td id="tdNyqDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Symbol Rate (Baud)</td>
+                      <td id="tdBaudDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>FEC Config (N, K)</td>
+                      <td id="tdFecDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Theoretical Slicer SNR</td>
+                      <td id="tdTheoSnrDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>Implementation Loss</td>
+                      <td id="tdImplLossDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr class="highlight">
+                      <td>Estimated Slicer SNR</td>
+                      <td id="tdEstSnrDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                      <td>Required Slicer SNR</td>
+                      <td id="tdReqSnrDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr class="highlight" style="font-size: 0.9rem;">
+                      <td>SNR Margin</td>
+                      <td id="tdMarginDs" style="text-align: right; font-family: var(--font-mono); font-weight: 700;">--</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem;">
+              <table class="budget-table" style="max-width: 500px;">
+                <thead>
+                  <tr>
+                    <th colspan="3">Common Channel Losses @ Nyquist</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Cable Insertion Loss @ Nyq Us</td>
+                    <td id="tdCableLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
+                  </tr>
+                  <tr>
+                    <td>Total Channel Insertion Loss @ Nyq Us</td>
+                    <td id="tdChannelLossNyq" style="text-align: right; font-family: var(--font-mono);">--</td>
+                  </tr>
+                  <tr>
+                    <td>Wire Echo Baseline Limit</td>
+                    <td id="tdWireEcho" style="text-align: right; font-family: var(--font-mono);">--</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab: Frequency Sweep Rows -->
+          <div class="tab-panel" id="tabTable">
+            <div class="table-actions">
+              <div class="search-input-wrapper">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="tableSearch" class="search-input" placeholder="Search frequency or value...">
+              </div>
+              <button class="action-btn-sm" id="btnCsvDownload">
+                <!-- SVG Download Icon -->
+                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+                </svg>
+                Export CSV Data
+              </button>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Step</th>
+                    <th>Frequency</th>
+                    <th>Cable Loss</th>
+                    <th>PCB Loss</th>
+                    <th>Total Loss</th>
+                    <th>Tx PSD US</th>
+                    <th>Tx PSD DS</th>
+                    <th>SNR US</th>
+                    <th>SNR DS</th>
+                  </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                  <tr>
+                    <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">No data generated. Click compute.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tab: Exportable JSON config & results -->
+          <div class="tab-panel" id="tabJson">
+            <div class="table-actions" style="justify-content: flex-end; gap: 0.5rem;">
+              <input type="file" id="configLoader" accept=".json" style="display: none;">
+              <button class="action-btn-sm" id="btnLoadJson">
+                <!-- SVG Load Icon -->
+                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                Load Config
+              </button>
+              <button class="action-btn-sm" id="btnSaveJson">
+                <!-- SVG Save Icon -->
+                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                </svg>
+                Save Config
+              </button>
+              <button class="action-btn-sm" id="btnCopyJson">
+                <!-- SVG Copy Icon -->
+                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy to Clipboard
+              </button>
+            </div>
+            <div class="codeblock-wrapper">
+              <div class="codeblock-header">
+                <span class="codeblock-title">output_results.json</span>
+              </div>
+              <pre id="jsonPre">{}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Copied toast notification -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <span>Copied to clipboard successfully!</span>
+  </div>
+
+  <!-- Include capacity calculator core code -->
+  <script src="channel_capacity_calc.js"></script>
+
+  <script>
+    'use strict';
+
+    const SIMULATOR_VERSION = 'v1.2.0';
+
+    let lastResult = null;
+    let chartInstance = null;
+    let currentChartType = 'snr';
+
+    // Helper: Debouncer to prevent layout lag on continuous inputs
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Helper: Scientific notation converter (e.g. 1e-12 -> 0.000000000001, or vice versa)
+    function parseScientific(str) {
+      if (!str) return NaN;
+      return parseFloat(str);
+    }
+
+    // Initialize dropdown lists and form inputs from JS files
+    window.addEventListener('DOMContentLoaded', () => {
+      // Set the version badge dynamically from SIMULATOR_VERSION constant
+      const badgeVersion = document.querySelector('.badge-version');
+      if (badgeVersion) {
+        badgeVersion.textContent = `${SIMULATOR_VERSION} (IEEE 802.3ch / 3cy)`;
+      }
+
+      // 1. Resolve global models objects
+      const CHANNEL_MODELS = window.CHANNEL_MODELS || {};
+      const CONNECTOR_ECHO_C0 = window.CONNECTOR_ECHO_C0 || {};
+      const DEFAULT_INPUTS = window.DEFAULT_INPUTS || {};
+
+      const cableSelect = document.getElementById('cableModel');
+      const pcbSelect = document.getElementById('pcbModel');
+      const connectorSelect = document.getElementById('connectorEchoModel');
+
+      // Populate Cable Models options
+      cableSelect.innerHTML = '';
+      Object.keys(CHANNEL_MODELS).forEach(model => {
+        const opt = document.createElement('option');
+        opt.value = model;
+        opt.textContent = model;
+        if (model === DEFAULT_INPUTS.cableModel) opt.selected = true;
+        cableSelect.appendChild(opt);
+      });
+
+      // Populate PCB Trace models
+      pcbSelect.innerHTML = '';
+      Object.keys(CHANNEL_MODELS).forEach(model => {
+        const opt = document.createElement('option');
+        opt.value = model;
+        opt.textContent = model;
+        if (model === DEFAULT_INPUTS.pcbModel) opt.selected = true;
+        pcbSelect.appendChild(opt);
+      });
+
+      // Populate Connector Echo model profiles
+      connectorSelect.innerHTML = '';
+      Object.keys(CONNECTOR_ECHO_C0).forEach(model => {
+        const opt = document.createElement('option');
+        opt.value = model;
+        opt.textContent = model;
+        if (model === DEFAULT_INPUTS.connectorEchoModel) opt.selected = true;
+        connectorSelect.appendChild(opt);
+      });
+
+      // 2. Set default input values
+      for (const [key, val] of Object.entries(DEFAULT_INPUTS)) {
+        const inputField = document.getElementById(key);
+        if (inputField) {
+          // Do not overwrite dropdown selections set above
+          if (['cableModel', 'pcbModel', 'connectorEchoModel'].includes(key)) continue;
+          inputField.value = val;
+        }
+      }
+
+      // 3. Tab setup
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.tab).classList.add('active');
+          
+          // Re-render chart since it might have been hidden and needs size updating
+          if (btn.dataset.tab === 'tabCharts' && lastResult) {
+            updateCharts(lastResult);
+          }
+        });
+      });
+
+      // 4. Chart toggle setup
+      document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentChartType = btn.dataset.chart;
+          if (lastResult) {
+            updateCharts(lastResult);
+          }
+        });
+      });
+
+      // 5. Connect live recalculation on inputs change
+      const form = document.getElementById('configForm');
+      form.querySelectorAll('input, select').forEach(element => {
+        // Debounce only for typable text/number inputs to prevent lag
+        if (element.type === 'number' || element.type === 'text') {
+          element.addEventListener('input', debounce(runSimulation, 250));
+        } else {
+          element.addEventListener('change', runSimulation);
+        }
+      });
+
+      // 6. Manual recalculate button
+      document.getElementById('computeButton').addEventListener('click', runSimulation);
+
+      // 7. Data table search filter
+      document.getElementById('tableSearch').addEventListener('input', () => {
+        if (lastResult) renderDataTable(lastResult);
+      });
+
+      // 8. Copy JSON
+      document.getElementById('btnCopyJson').addEventListener('click', copyJsonOutput);
+      // 9. CSV Download
+      document.getElementById('btnCsvDownload').addEventListener('click', downloadCsv);
+ 
+      // 10. Load and Save JSON configurations
+      document.getElementById('btnSaveJson').addEventListener('click', saveJsonConfig);
+      document.getElementById('btnLoadJson').addEventListener('click', triggerLoadConfig);
+      document.getElementById('configLoader').addEventListener('change', handleLoadConfig);
+
+      // 11. Generate Simulation Report
+      document.getElementById('btnGenReport').addEventListener('click', generateReport);
+
+      // Run initial simulation calculation
+      runSimulation();
+    });
+
+    // Main Calculator logic bridging HTML inputs and JS capacity engine
+    function runSimulation() {
+      if (typeof window.compute !== 'function') {
+        console.error('Core compute function not found.');
+        return;
+      }
+
+      const form = document.getElementById('configForm');
+      const formData = new FormData(form);
+      const config = {};
+
+      formData.forEach((value, key) => {
+        // Handle scientific notation formatting (like Target BER 1e-12)
+        if (key === 'targetBer' || key === 'fMaxHz') {
+          config[key] = parseScientific(value);
+        } else if (key === 'wireReflectionLimit') {
+          // If value is numeric, parse it as float
+          const parsed = parseFloat(value);
+          config[key] = isNaN(parsed) ? value : parsed;
+        } else {
+          config[key] = isNaN(value) || value.trim() === '' ? value : parseFloat(value);
+        }
+      });
+
+      try {
+        const result = window.compute(config);
+        lastResult = result;
+        updateDashboard(result);
+      } catch (err) {
+        console.error(err);
+        alert(`Computation Error: ${err.message}`);
+      }
+    }
+
+    // Refresh UI Metrics Cards and Comparison grids
+    function updateDashboard(result) {
+      // 1. Fill Summary Cards
+      const marginUs = result.snrMarginDbUs;
+      const marginDs = result.snrMarginDbDs;
+
+      document.getElementById('valMarginUs').textContent = `${marginUs.toFixed(2)} dB`;
+      document.getElementById('valMarginDs').textContent = `${marginDs.toFixed(2)} dB`;
+
+      document.getElementById('valNyqUs').textContent = `${(result.nyquistHzUs / 1e9).toFixed(3)} GHz`;
+      document.getElementById('valNyqDs').textContent = `${(result.nyquistHzDs / 1e9).toFixed(3)} GHz`;
+
+      document.getElementById('valEstReqUs').textContent = `${result.estimatedSlicerSnrDbUs.toFixed(1)} / ${result.requiredSlicerSnrDbUs.toFixed(1)} dB`;
+      document.getElementById('valEstReqDs').textContent = `${result.estimatedSlicerSnrDbDs.toFixed(1)} / ${result.requiredSlicerSnrDbDs.toFixed(1)} dB`;
+
+      // Card Margins Badges
+      const badgeUs = document.getElementById('badgeUs');
+      if (marginUs >= 0) {
+        badgeUs.textContent = 'PASS';
+        badgeUs.className = 'metric-badge success';
+      } else {
+        badgeUs.textContent = 'FAIL';
+        badgeUs.className = 'metric-badge danger';
+      }
+
+      const badgeDs = document.getElementById('badgeDs');
+      if (marginDs >= 0) {
+        badgeDs.textContent = 'PASS';
+        badgeDs.className = 'metric-badge success';
+      } else {
+        badgeDs.textContent = 'FAIL';
+        badgeDs.className = 'metric-badge danger';
+      }
+
+      // 2. Budget Breakdown Detail Grid values
+      document.getElementById('tdNyqUs').textContent = `${(result.nyquistHzUs / 1e9).toFixed(3)} GHz`;
+      document.getElementById('tdNyqDs').textContent = `${(result.nyquistHzDs / 1e9).toFixed(3)} GHz`;
+      
+      document.getElementById('tdBaudUs').textContent = `${(result.sampleRateHzUs / 1e9).toFixed(3)} GBaud`;
+      document.getElementById('tdBaudDs').textContent = `${(result.sampleRateHzDs / 1e9).toFixed(3)} GBaud`;
+
+      const nUs = result.input.fecBlockSizeUs ?? result.input.fecBlockSize;
+      const kUs = result.input.fecDataSizeUs ?? result.input.fecDataSize;
+      document.getElementById('tdFecUs').textContent = `${nUs} / ${kUs} (t=${result.fecUs.correctionSymbols})`;
+
+      const nDs = result.input.fecBlockSizeDs ?? result.input.fecBlockSize;
+      const kDs = result.input.fecDataSizeDs ?? result.input.fecDataSize;
+      document.getElementById('tdFecDs').textContent = `${nDs} / ${kDs} (t=${result.fecDs.correctionSymbols})`;
+
+      document.getElementById('tdTheoSnrUs').textContent = `${result.theoreticalSlicerSnrDbUs.toFixed(2)} dB`;
+      document.getElementById('tdTheoSnrDs').textContent = `${result.theoreticalSlicerSnrDbDs.toFixed(2)} dB`;
+
+      document.getElementById('tdImplLossUs').textContent = `${result.input.implementationLossDbUs.toFixed(1)} dB`;
+      document.getElementById('tdImplLossDs').textContent = `${result.input.implementationLossDbDs.toFixed(1)} dB`;
+
+      document.getElementById('tdEstSnrUs').textContent = `${result.estimatedSlicerSnrDbUs.toFixed(2)} dB`;
+      document.getElementById('tdEstSnrDs').textContent = `${result.estimatedSlicerSnrDbDs.toFixed(2)} dB`;
+
+      document.getElementById('tdReqSnrUs').textContent = `${result.requiredSlicerSnrDbUs.toFixed(2)} dB`;
+      document.getElementById('tdReqSnrDs').textContent = `${result.requiredSlicerSnrDbDs.toFixed(2)} dB`;
+
+      document.getElementById('tdMarginUs').textContent = `${marginUs.toFixed(2)} dB`;
+      document.getElementById('tdMarginDs').textContent = `${marginDs.toFixed(2)} dB`;
+      document.getElementById('tdMarginUs').style.color = marginUs >= 0 ? 'var(--success)' : 'var(--danger)';
+      document.getElementById('tdMarginDs').style.color = marginDs >= 0 ? 'var(--success)' : 'var(--danger)';
+
+      // 3. Loss details
+      document.getElementById('tdCableLossNyq').textContent = `${result.cableLossNyquistDbUs.toFixed(2)} dB`;
+      document.getElementById('tdChannelLossNyq').textContent = `${result.channelInsertionLossNyquistDbUs.toFixed(2)} dB`;
+      document.getElementById('tdWireEcho').textContent = `${result.wireEchoDb.toFixed(1)} dB`;
+
+      // 4. Update secondary modules
+      updateCharts(result);
+      renderDataTable(result);
+      
+      // Update Export JSON tab
+      // Avoid printing entire rows array in simple UI debug JSON to keep it readable
+      const debugResult = { ...result };
+      delete debugResult.rows; 
+      document.getElementById('jsonPre').textContent = JSON.stringify(debugResult, null, 2);
+    }
+
+    // Graph visual graphs using Chart.js on canvas
+    function updateCharts(result) {
+      if (typeof Chart === 'undefined') return;
+
+      const canvas = document.getElementById('chartCanvas');
+      const ctx = canvas.getContext('2d');
+
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+
+      if (currentChartType === 'snr') {
+        const snrUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbUs }));
+        const snrDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbDs }));
+        const maxVal = Math.max(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
+        const minVal = Math.min(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
+        const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Upstream SNR (dB)',
+                data: snrUs,
+                borderColor: 'hsl(263, 90%, 65%)',
+                backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: true
+              },
+              {
+                label: 'Downstream SNR (dB)',
+                data: snrDs,
+                borderColor: 'hsl(188, 86%, 53%)',
+                backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#e2e8f0', font: { family: 'Inter', weight: 'bold' } }
+              },
+              tooltip: {
+                backgroundColor: 'hsl(222, 47%, 11%)',
+                titleColor: '#fff',
+                bodyColor: '#e2e8f0',
+                borderColor: 'hsl(217, 33%, 22%)',
+                borderWidth: 1,
+                callbacks: {
+                  title: (items) => `${items[0].parsed.x.toFixed(3)} GHz`
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                title: { display: true, text: 'Frequency (GHz)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              },
+              y: {
+                min: yMin,
+                title: { display: true, text: 'SNR (dB)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              }
+            }
+          }
+        });
+      } else if (currentChartType === 'loss') {
+        const cableLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilCableDb }));
+        const pcbLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilPcbDb }));
+        const totalLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilDb }));
+        const maxVal = Math.max(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
+        const minVal = Math.min(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
+        const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Cable Insertion Loss (dB)',
+                data: cableLoss,
+                borderColor: '#f59e0b',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: false
+              },
+              {
+                label: 'PCB Insertion Loss (dB)',
+                data: pcbLoss,
+                borderColor: '#ef4444',
+                borderWidth: 2,
+                pointRadius: 0,
+                fill: false
+              },
+              {
+                label: 'Total Channel Loss (dB)',
+                data: totalLoss,
+                borderColor: '#38bdf8',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                fill: false
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#e2e8f0', font: { family: 'Inter', weight: 'bold' } }
+              },
+              tooltip: {
+                backgroundColor: 'hsl(222, 47%, 11%)',
+                titleColor: '#fff',
+                bodyColor: '#e2e8f0',
+                borderColor: 'hsl(217, 33%, 22%)',
+                borderWidth: 1,
+                callbacks: {
+                  title: (items) => `${items[0].parsed.x.toFixed(3)} GHz`
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                title: { display: true, text: 'Frequency (GHz)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              },
+              y: {
+                min: yMin,
+                title: { display: true, text: 'Loss (dB)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              }
+            }
+          }
+        });
+      } else if (currentChartType === 'psd') {
+        const txPsdUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdUs }));
+        const txPsdDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdDs }));
+        const maxVal = Math.max(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
+        const minVal = Math.min(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
+        const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            datasets: [
+              {
+                label: 'Upstream Tx PSD (dBm/Hz)',
+                data: txPsdUs,
+                borderColor: 'hsl(263, 90%, 65%)',
+                backgroundColor: 'rgba(139, 92, 246, 0.05)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: true
+              },
+              {
+                label: 'Downstream Tx PSD (dBm/Hz)',
+                data: txPsdDs,
+                borderColor: 'hsl(188, 86%, 53%)',
+                backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                borderWidth: 2.5,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: '#e2e8f0', font: { family: 'Inter', weight: 'bold' } }
+              },
+              tooltip: {
+                backgroundColor: 'hsl(222, 47%, 11%)',
+                titleColor: '#fff',
+                bodyColor: '#e2e8f0',
+                borderColor: 'hsl(217, 33%, 22%)',
+                borderWidth: 1,
+                callbacks: {
+                  title: (items) => `${items[0].parsed.x.toFixed(3)} GHz`
+                }
+              }
+            },
+            scales: {
+              x: {
+                type: 'linear',
+                title: { display: true, text: 'Frequency (GHz)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              },
+              y: {
+                min: yMin,
+                title: { display: true, text: 'Power Spectral Density (dBm/Hz)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                ticks: { color: '#94a3b8' }
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Populate data table rows with optional text matching filters
+    function renderDataTable(result) {
+      const tbody = document.getElementById('dataTableBody');
+      tbody.innerHTML = '';
+
+      const searchVal = document.getElementById('tableSearch').value.toLowerCase().trim();
+
+      result.rows.forEach((row, index) => {
+        const freqGHz = row.fHz / 1e9;
+        
+        // Match string values for search filtering
+        const freqText = freqGHz.toFixed(3);
+        const cableText = row.ilCableDb.toFixed(2);
+        const totalText = row.ilDb.toFixed(2);
+        const snrUsText = row.snrDbUs.toFixed(2);
+        const snrDsText = row.snrDbDs.toFixed(2);
+
+        if (searchVal) {
+          const match = freqText.includes(searchVal) || 
+                        cableText.includes(searchVal) || 
+                        totalText.includes(searchVal) || 
+                        snrUsText.includes(searchVal) || 
+                        snrDsText.includes(searchVal);
+          if (!match) return;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${freqText} GHz</td>
+          <td>${cableText} dB</td>
+          <td>${row.ilPcbDb.toFixed(2)} dB</td>
+          <td style="color: #38bdf8;">${totalText} dB</td>
+          <td>${row.txPsdUs.toFixed(1)}</td>
+          <td>${row.txPsdDs.toFixed(1)}</td>
+          <td style="color: var(--us-color); font-weight: 500;">${snrUsText} dB</td>
+          <td style="color: var(--ds-color); font-weight: 500;">${snrDsText} dB</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (tbody.children.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 2rem;">No matching rows found.</td></tr>`;
+      }
+    }
+
+    // Action: Copy JSON output to user clipboard
+    function copyJsonOutput() {
+      const jsonText = document.getElementById('jsonPre').textContent;
+      navigator.clipboard.writeText(jsonText)
+        .then(() => {
+          showToast('JSON copy successful!');
+        })
+        .catch(err => {
+          alert('Failed to copy text: ', err);
+        });
+    }
+
+    // Action: Build dynamic CSV structure and trigger browser download
+    function downloadCsv() {
+      if (!lastResult) return;
+
+      const header = 'Step,Frequency (Hz),Cable Loss (dB),PCB Loss (dB),Total Loss (dB),Tx PSD US (dBm/Hz),Tx PSD DS (dBm/Hz),Rx PSD US (dBm/Hz),Rx PSD DS (dBm/Hz),Wire Echo (dB),Connector Echo (dB),Channel Echo (dB),Rx Echo US (dB),Rx Echo DS (dB),Echo Res US (dB),Echo Res DS (dB),Noise US (dB),Noise DS (dB),SNR US (dB),SNR DS (dB)\n';
+      
+      const body = lastResult.rows.map((r, i) => {
+        return `${i + 1},${r.fHz},${r.ilCableDb},${r.ilPcbDb},${r.ilDb},${r.txPsdUs},${r.txPsdDs},${r.rxPsdUs},${r.rxPsdDs},${r.wireEchoDb},${r.connectorEchoDb},${r.channelEchoDb},${r.rxEchoUs},${r.rxEchoDs},${r.echoResUs},${r.echoResDs},${r.noiseUs},${r.noiseDs},${r.snrDbUs},${r.snrDbDs}`;
+      }).join('\n');
+
+      const blob = new Blob([header + body], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `capacity_sweep_${lastResult.input.cableModel}_${lastResult.input.cableLengthM}m.csv`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showToast('CSV export started!');
+    }
+
+    // Action: Download active inputs object as JSON config file
+    function saveJsonConfig() {
+      if (!lastResult) return;
+      const configData = lastResult.input;
+      const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `capacity_config_${configData.cableModel}_${configData.cableLengthM}m.json`;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showToast('Configuration file saved!');
+    }
+
+    // Action: Trigger clicks on hidden file loader element
+    function triggerLoadConfig() {
+      document.getElementById('configLoader').click();
+    }
+
+    // Action: Parse loaded file and update HTML inputs
+    function handleLoadConfig(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const config = JSON.parse(e.target.result);
+          
+          let loadedCount = 0;
+          for (const [key, val] of Object.entries(config)) {
+            const inputField = document.getElementById(key);
+            if (inputField) {
+              inputField.value = val;
+              loadedCount++;
+            }
+          }
+
+          if (loadedCount > 0) {
+            runSimulation();
+            showToast('Configuration loaded successfully!');
+          } else {
+            alert('The JSON file did not contain any valid simulator parameters.');
+          }
+        } catch (err) {
+          alert('Failed to parse config file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // Action: Parse loaded file and update HTML inputs
+    function handleLoadConfig(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const config = JSON.parse(e.target.result);
+          
+          let loadedCount = 0;
+          for (const [key, val] of Object.entries(config)) {
+            const inputField = document.getElementById(key);
+            if (inputField) {
+              inputField.value = val;
+              loadedCount++;
+            }
+          }
+
+          if (loadedCount > 0) {
+            runSimulation();
+            showToast('Configuration loaded successfully!');
+          } else {
+            alert('The JSON file did not contain any valid simulator parameters.');
+          }
+        } catch (err) {
+          alert('Failed to parse config file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // Action: Generate and download simulation report in HTML format
+    async function generateReport() {
+      if (!lastResult) return;
+      
+      showToast('Generating report waveforms...');
+      
+      try {
+        const snrImg = await generateOffscreenChartImage('snr', lastResult);
+        const lossImg = await generateOffscreenChartImage('loss', lastResult);
+        const psdImg = await generateOffscreenChartImage('psd', lastResult);
+        
+        showToast('Compiling report data...');
+        
+        const cableLossNyqDs = -window.channelInsertionLossPerMeterDb(
+          window.excelApproxVlookupFrequency(lastResult.nyquistHzDs, lastResult.fStepHz),
+          lastResult.input.cableModel,
+          lastResult.input.temperatureC
+        ) * lastResult.input.cableLengthM;
+        
+        const channelLossNyqDs = -(
+          window.channelInsertionLossPerMeterDb(window.excelApproxVlookupFrequency(lastResult.nyquistHzDs, lastResult.fStepHz), lastResult.input.cableModel, lastResult.input.temperatureC) * lastResult.input.cableLengthM +
+          window.channelInsertionLossPerMeterDb(window.excelApproxVlookupFrequency(lastResult.nyquistHzDs, lastResult.fStepHz), lastResult.input.pcbModel, lastResult.input.temperatureC) * lastResult.input.pcbTraceLengthM
+        );
+        
+        const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Link Budget Simulation Report</title>
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #334155; margin: 40px; line-height: 1.6; background-color: #ffffff; }
+    h1 { color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 5px; }
+    .subtitle { color: #64748b; font-size: 0.95rem; margin-top: 0; margin-bottom: 30px; }
+    .meta-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 30px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.85rem; }
+    .meta-item { display: flex; justify-content: space-between; padding: 2px 0; }
+    .meta-label { font-weight: bold; color: #475569; }
+    .section-title { font-size: 1.25rem; color: #0f172a; margin-top: 40px; border-left: 4px solid #6366f1; padding-left: 10px; margin-bottom: 15px; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .card.pass { border-left: 5px solid #10b981; background-color: #f0fdf4; }
+    .card.fail { border-left: 5px solid #ef4444; background-color: #fef2f2; }
+    .card-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; }
+    .metric-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
+    .metric-table th, .metric-table td { border-bottom: 1px solid #e2e8f0; padding: 8px 12px; text-align: left; }
+    .metric-table th { background-color: #f1f5f9; color: #475569; font-weight: bold; }
+    .chart-container { text-align: center; margin: 30px 0; page-break-inside: avoid; }
+    .chart-img { max-width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .chart-caption { font-size: 0.85rem; color: #64748b; margin-top: 8px; }
+    .introduction { background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-bottom: 30px; font-size: 0.95rem; color: #1e3a8a; }
+  </style>
+</head>
+<body>
+  <h1>Link Budget Simulation Report</h1>
+  <div class="subtitle">Generated by Link Budget Simulator ${SIMULATOR_VERSION}</div>
+  
+  <div class="introduction">
+    <strong>About This Report:</strong> This link budget simulation report was generated by the **Link Budget Simulator (${SIMULATOR_VERSION})**. It contains calculated parameters, performance budgets, and insertion loss profiles evaluating multi-gigabit baseband link performance according to IEEE 802.3ch / 802.3cy guidelines.
+  </div>
+
+  <div class="section-title">Execution Metadata & Configurations</div>
+  <div class="meta-box">
+    <div class="meta-item"><span class="meta-label">Simulation Date:</span> <span>${new Date().toLocaleString()}</span></div>
+    <div class="meta-item"><span class="meta-label">Cable Model:</span> <span>${lastResult.input.cableModel}</span></div>
+    <div class="meta-item"><span class="meta-label">Cable Length:</span> <span>${lastResult.input.cableLengthM} meters</span></div>
+    <div class="meta-item"><span class="meta-label">Connectors Count:</span> <span>${lastResult.input.numberOfConnectors}</span></div>
+    <div class="meta-item"><span class="meta-label">Target BER:</span> <span>${lastResult.input.targetBer}</span></div>
+    <div class="meta-item"><span class="meta-label">PCB Trace Model:</span> <span>${lastResult.input.pcbModel}</span></div>
+    <div class="meta-item"><span class="meta-label">Temperature:</span> <span>${lastResult.input.temperatureC} °C</span></div>
+    <div class="meta-item"><span class="meta-label">Wire Echo Model:</span> <span>${lastResult.input.connectorEchoModel}</span></div>
+  </div>
+
+  <div class="section-title">Link Performance Summary</div>
+  <div class="grid">
+    <div class="card ${lastResult.snrMarginDbUs >= 0 ? 'pass' : 'fail'}">
+      <div class="card-title">Upstream Transmission (US)</div>
+      <div>Margin: <strong>${lastResult.snrMarginDbUs.toFixed(2)} dB</strong> (${lastResult.snrMarginDbUs >= 0 ? 'PASS' : 'FAIL'})</div>
+      <table class="metric-table">
+        <tr><td>Data Rate</td><td>${lastResult.input.dataRateGbpsUs} Gbps</td></tr>
+        <tr><td>Modulation</td><td>PAM${lastResult.input.pamUs}</td></tr>
+        <tr><td>Nyquist Frequency</td><td>${(lastResult.nyquistHzUs / 1e9).toFixed(3)} GHz</td></tr>
+        <tr><td>Estimated Slicer SNR</td><td>${lastResult.estimatedSlicerSnrDbUs.toFixed(2)} dB</td></tr>
+        <tr><td>Required Slicer SNR</td><td>${lastResult.requiredSlicerSnrDbUs.toFixed(2)} dB</td></tr>
+      </table>
+    </div>
+    
+    <div class="card ${lastResult.snrMarginDbDs >= 0 ? 'pass' : 'fail'}">
+      <div class="card-title">Downstream Transmission (DS)</div>
+      <div>Margin: <strong>${lastResult.snrMarginDbDs.toFixed(2)} dB</strong> (${lastResult.snrMarginDbDs >= 0 ? 'PASS' : 'FAIL'})</div>
+      <table class="metric-table">
+        <tr><td>Data Rate</td><td>${lastResult.input.dataRateGbpsDs} Gbps</td></tr>
+        <tr><td>Modulation</td><td>PAM${lastResult.input.pamDs}</td></tr>
+        <tr><td>Nyquist Frequency</td><td>${(lastResult.nyquistHzDs / 1e9).toFixed(3)} GHz</td></tr>
+        <tr><td>Estimated Slicer SNR</td><td>${lastResult.estimatedSlicerSnrDbDs.toFixed(2)} dB</td></tr>
+        <tr><td>Required Slicer SNR</td><td>${lastResult.requiredSlicerSnrDbDs.toFixed(2)} dB</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section-title">Link Budget Parameters</div>
+  <table class="metric-table">
+    <thead>
+      <tr>
+        <th>Parameter Name</th>
+        <th>Upstream Value</th>
+        <th>Downstream Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Baud Rate</td>
+        <td>${(lastResult.sampleRateHzUs / 1e9).toFixed(3)} GBaud</td>
+        <td>${(lastResult.sampleRateHzDs / 1e9).toFixed(3)} GBaud</td>
+      </tr>
+      <tr>
+        <td>FEC Configuration (N, K)</td>
+        <td>${lastResult.input.fecBlockSizeUs} / ${lastResult.input.fecDataSizeUs} (t=${lastResult.fecUs.correctionSymbols})</td>
+        <td>${lastResult.input.fecBlockSizeDs} / ${lastResult.input.fecDataSizeDs} (t=${lastResult.fecDs.correctionSymbols})</td>
+      </tr>
+      <tr>
+        <td>Tx Power Level</td>
+        <td>${lastResult.input.txPowerDbmUs} dBm</td>
+        <td>${lastResult.input.txPowerDbmDs} dBm</td>
+      </tr>
+      <tr>
+        <td>AFE Noise Spectral Density</td>
+        <td>${lastResult.input.afeNoiseDbmPerHzUs} dBm/Hz</td>
+        <td>${lastResult.input.afeNoiseDbmPerHzDs} dBm/Hz</td>
+      </tr>
+      <tr>
+        <td>Cable Loss @ Nyquist</td>
+        <td>${lastResult.cableLossNyquistDbUs.toFixed(2)} dB</td>
+        <td>${cableLossNyqDs.toFixed(2)} dB</td>
+      </tr>
+      <tr>
+        <td>Channel Loss @ Nyquist</td>
+        <td>${lastResult.channelInsertionLossNyquistDbUs.toFixed(2)} dB</td>
+        <td>${channelLossNyqDs.toFixed(2)} dB</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title">Visual Waveforms & Profiles</div>
+  
+  <div class="chart-container">
+    <h3>Signal-to-Noise Ratio (SNR) vs. Frequency</h3>
+    <img class="chart-img" src="${snrImg}" alt="SNR Profile Chart">
+    <div class="chart-caption">Figure 1: Comparison of Upstream and Downstream Signal-to-Noise Ratio (SNR) profiles across the frequency band.</div>
+  </div>
+
+  <div class="chart-container">
+    <h3>Insertion Loss Profiles vs. Frequency</h3>
+    <img class="chart-img" src="${lossImg}" alt="Loss Profiles Chart">
+    <div class="chart-caption">Figure 2: Distribution of Insertion Loss contribution from Coaxial Cable and PCB trace interfaces vs. total channel loss.</div>
+  </div>
+
+  <div class="chart-container">
+    <h3>Transmit Power Spectral Density (PSD) vs. Frequency</h3>
+    <img class="chart-img" src="${psdImg}" alt="PSD Profile Chart">
+    <div class="chart-caption">Figure 3: Transmit PSD mask profiles across the evaluated band.</div>
+  </div>
+</body>
+</html>`;
+
+        const blob = new Blob([reportHtml], { type: 'text/html;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `link_budget_report_${lastResult.input.cableModel}_${lastResult.input.cableLengthM}m.html`;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showToast('Report generated successfully!');
+      } catch (err) {
+        console.error(err);
+        alert('Failed to generate report: ' + err.message);
+      }
+    }
+
+    // Helper: Draw offscreen Chart.js instances for print-ready light theme formatting
+    function generateOffscreenChartImage(type, result) {
+      return new Promise((resolve) => {
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = 900;
+        tempCanvas.height = 400;
+        tempCanvas.style.display = 'none';
+        document.body.appendChild(tempCanvas);
+        const ctx = tempCanvas.getContext('2d');
+
+        const frequenciesGHz = result.rows.map(r => r.fHz / 1e9);
+        let config = {};
+
+        if (type === 'snr') {
+          const snrUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbUs }));
+          const snrDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbDs }));
+          const maxVal = Math.max(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
+          const minVal = Math.min(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
+          const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+          config = {
+            type: 'line',
+            data: {
+              datasets: [
+                { label: 'Upstream SNR (dB)', data: snrUs, borderColor: 'hsl(263, 90%, 55%)', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Downstream SNR (dB)', data: snrDs, borderColor: 'hsl(188, 86%, 45%)', borderWidth: 2, pointRadius: 0, fill: false }
+              ]
+            },
+            options: {
+              animation: false,
+              responsive: false,
+              devicePixelRatio: 2,
+              plugins: {
+                legend: { labels: { color: '#0f172a', font: { family: 'Helvetica Neue', weight: 'bold' } } }
+              },
+              scales: {
+                x: { type: 'linear', title: { display: true, text: 'Frequency (GHz)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } },
+                y: { min: yMin, title: { display: true, text: 'SNR (dB)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } }
+              }
+            }
+          };
+        } else if (type === 'loss') {
+          const cableLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilCableDb }));
+          const pcbLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilPcbDb }));
+          const totalLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilDb }));
+          const maxVal = Math.max(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
+          const minVal = Math.min(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
+          const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+          config = {
+            type: 'line',
+            data: {
+              datasets: [
+                { label: 'Cable Loss (dB)', data: cableLoss, borderColor: '#f59e0b', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'PCB Loss (dB)', data: pcbLoss, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Total Loss (dB)', data: totalLoss, borderColor: '#38bdf8', borderWidth: 2, pointRadius: 0, fill: false }
+              ]
+            },
+            options: {
+              animation: false,
+              responsive: false,
+              devicePixelRatio: 2,
+              plugins: {
+                legend: { labels: { color: '#0f172a', font: { family: 'Helvetica Neue', weight: 'bold' } } }
+              },
+              scales: {
+                x: { type: 'linear', title: { display: true, text: 'Frequency (GHz)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } },
+                y: { min: yMin, title: { display: true, text: 'Loss (dB)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } }
+              }
+            }
+          };
+        } else if (type === 'psd') {
+          const txPsdUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdUs }));
+          const txPsdDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdDs }));
+          const maxVal = Math.max(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
+          const minVal = Math.min(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
+          const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+
+          config = {
+            type: 'line',
+            data: {
+              datasets: [
+                { label: 'Upstream Tx PSD (dBm/Hz)', data: txPsdUs, borderColor: 'hsl(263, 90%, 55%)', borderWidth: 2, pointRadius: 0, fill: false },
+                { label: 'Downstream Tx PSD (dBm/Hz)', data: txPsdDs, borderColor: 'hsl(188, 86%, 45%)', borderWidth: 2, pointRadius: 0, fill: false }
+              ]
+            },
+            options: {
+              animation: false,
+              responsive: false,
+              devicePixelRatio: 2,
+              plugins: {
+                legend: { labels: { color: '#0f172a', font: { family: 'Helvetica Neue', weight: 'bold' } } }
+              },
+              scales: {
+                x: { type: 'linear', title: { display: true, text: 'Frequency (GHz)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } },
+                y: { min: yMin, title: { display: true, text: 'PSD (dBm/Hz)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } }
+              }
+            }
+          };
+        }
+
+        const chart = new Chart(ctx, config);
+        const dataUrl = tempCanvas.toDataURL('image/png');
+        chart.destroy();
+        document.body.removeChild(tempCanvas);
+        resolve(dataUrl);
+      });
+    }
+
+    // Helper: Toast display notification
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.querySelector('span').textContent = msg;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
