@@ -2,8 +2,8 @@
 .vs/
 .vscode/
 
-# Excel temporary files
-~$*.xlsx
+# Excel files
+*.xlsx
 
 # Local environment/debug files
 *.log
