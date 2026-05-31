@@ -212,7 +212,7 @@ label {
   color: var(--text-muted);
 }
 
-input, select {
+input, select, textarea {
   background-color: var(--bg-input);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -222,10 +222,19 @@ input, select {
   font-family: var(--font-sans);
   width: 100%;
   transition: var(--transition);
+  box-sizing: border-box;
+}
+
+input, select {
   height: 38px;
 }
 
-input:focus, select:focus {
+textarea {
+  min-height: 54px;
+  resize: vertical;
+}
+
+input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 3px var(--primary-glow);

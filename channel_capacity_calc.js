@@ -28,6 +28,8 @@ const MODULATION_TABLE = Object.freeze({
 });
 
 const DEFAULT_INPUTS = Object.freeze({
+  configTitle: '',
+  configDescription: '',
   dataRateGbpsUs: 25,
   dataRateGbpsDs: 25,
   targetBer: 1e-12,
