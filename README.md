@@ -1,6 +1,6 @@
-# Link Budget Simulator
+# Link Budget Calculator
 
-An interactive, premium baseband channel capacity simulator and multi-gigabit link budget analyzer. This application provides real-time hardware transmission line validation adhering to the **IEEE 802.3ch** (Multi-Gig Automotive Ethernet) and **IEEE 802.3cy** (10G/25G/50G Automotive Ethernet) physical layer guidelines.
+An interactive, link budget calculator based on Salz SNR calcultions and channel insertion loss models. This application provides interactive transmission line SNR calculations for modulations like **IEEE 802.3ch** (Multi-Gig Automotive Ethernet) and **IEEE 802.3cy** (25G Automotive Ethernet).
 
 ---
 
@@ -19,7 +19,6 @@ For a detailed breakdown of the mathematical engine, parameter directories, and 
   1. **Signal-to-Noise Ratio (SNR)** profiles vs. Frequency.
   2. **Insertion Loss Profiles** separating Cable Loss, PCB Loss, and Total Channel Loss.
   3. **Transmit Power Spectral Density (PSD)** mask shapes (e.g. ZOH, Butterworth, eq149-14, eq149-22).
-* **Smart Y-Axis Bounding**: Automatically caps insertion loss and SNR ranges to a maximum span of 150 dB to prevent extreme high-frequency attenuation from compressing visible signals.
 * **JSON Configuration Backup**: Instant buttons to **Save Config** (downloads current inputs state as a `.json` backup) and **Load Config** (restores parameters and triggers debounced live recalculations).
 * **Print-Ready HTML Reports**: Generates custom, standalone, print-friendly HTML summaries embedding light-themed high-resolution offscreen chart waveforms.
 
