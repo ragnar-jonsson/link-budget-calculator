@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Link Budget Simulator | Interactive User Manual</title>
+  <title>Link Budget Calculator | Interactive User Manual</title>
   <link rel="stylesheet" href="index.css">
   <style>
     /* Manual Page Custom Adjustments */
@@ -224,7 +224,7 @@
         </svg>
       </div>
       <div class="logo-text">
-        <h1>Link Budget Simulator</h1>
+        <h1>Link Budget Calculator</h1>
         <p>User Manual & Technical Documentation</p>
       </div>
     </div>
@@ -235,7 +235,7 @@
         <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Open Simulator
+        Open Calculator
       </a>
     </div>
   </header>
@@ -256,7 +256,7 @@
       </ul>
       <div class="info-callout" style="margin: 0; padding: 0.875rem; font-size: 0.75rem;">
         <h4>Need Quick Help?</h4>
-        <p style="font-size: 0.75rem; margin: 0; line-height: 1.4;">Hover over parameters in the simulator sidebar to display built-in tooltips directly.</p>
+        <p style="font-size: 0.75rem; margin: 0; line-height: 1.4;">Hover over parameters in the calculator sidebar to display built-in tooltips directly.</p>
       </div>
     </aside>
 
@@ -267,10 +267,10 @@
       <section class="manual-section" id="sectionIntro">
         <h2>1. Introduction & Overview</h2>
         <p>
-          Welcome to the <strong>Link Budget Simulator</strong> (Version 1.2.0) User Manual. This application is a web-based, baseband channel capacity simulation dashboard designed for hardware design and transmission engineering validation.
+          Welcome to the <strong>Link Budget Calculator</strong> (Version 1.2.0) User Manual. This application is a web-based, baseband channel capacity calculation dashboard designed for hardware design and transmission engineering validation.
         </p>
         <p>
-          The simulator is designed to evaluate high-speed automotive communication standards over physical cable models, specifically adhering to guidelines within:
+          The calculator is designed to evaluate high-speed automotive communication standards over physical cable models, specifically adhering to guidelines within:
         </p>
         <ul>
           <li><strong>IEEE 802.3ch</strong> (Multi-Gigabit Automotive Copper Physical Layer Solutions - e.g., 2.5 Gbps, 5 Gbps, and 10 Gbps).</li>
@@ -278,7 +278,7 @@
         </li>
         </ul>
         <p>
-          The core simulator models signal attenuation, PCB trace degradation, transmit power masks, connector profiles, wire and reflection echoes, echo cancellation, AFE noise, and Forward Error Correction (FEC) algorithms to verify the overall **SNR Margin** of a link.
+          The core calculator models signal attenuation, PCB trace degradation, transmit power masks, connector profiles, wire and reflection echoes, echo cancellation, AFE noise, and Forward Error Correction (FEC) algorithms to verify the overall **SNR Margin** of a link.
         </p>
       </section>
 
@@ -302,7 +302,7 @@
 
         <h3>2.2 Echo Contributions & Noise Model</h3>
         <p>
-          The simulator models echo interference from connector interfaces and reflections along the wire:
+          The calculator models echo interference from connector interfaces and reflections along the wire:
         </p>
         <ul>
           <li><strong>Connector Echo Profile</strong>: Modeled via connector constant $C_0$ scaled by inline connector count and step frequency.</li>
@@ -326,7 +326,7 @@
       <section class="manual-section" id="sectionParams">
         <h2>3. Parameter Dictionary</h2>
         <p>
-          This searchable list displays all configuration settings available in the simulator window's parameter panels. Use the search box below to filter inputs instantly.
+          This searchable list displays all configuration settings available in the calculator window's parameter panels. Use the search box below to filter inputs instantly.
         </p>
 
         <!-- Dynamic Table Search -->
@@ -469,7 +469,7 @@
       <section class="manual-section" id="sectionOutputs">
         <h2>4. Dashboard Indicators</h2>
         <p>
-          The simulator outputs results across several high-visibility dashboards:
+          The calculator outputs results across several high-visibility dashboards:
         </p>
         
         <h3>4.1 Summary Metric Cards</h3>
@@ -510,7 +510,7 @@
         <div class="info-callout">
           <h4>Y-Axis Span Capping Rule</h4>
           <p style="margin: 0; line-height: 1.5;">
-            To prevent extreme attenuation values (e.g. at high frequencies or long cables) from compressing the visible region of the chart, the simulator enforces a **maximum Y-axis range span of 150 dB**. If the data span exceeds 150 dB, the minimum display value is capped at <code>max - 150</code>, keeping peak profiles fully visible.
+            To prevent extreme attenuation values (e.g. at high frequencies or long cables) from compressing the visible region of the chart, the calculator enforces a **maximum Y-axis range span of 150 dB**. If the data span exceeds 150 dB, the minimum display value is capped at <code>max - 150</code>, keeping peak profiles fully visible.
           </p>
         </div>
 
@@ -528,11 +528,11 @@
         
         <h3>6.1 Backup & Config JSON</h3>
         <p>
-          The **JSON Config** tab allows developers to inspect, export, or restore simulator states:
+          The **JSON Config** tab allows developers to inspect, export, or restore calculator states:
         </p>
         <ul>
           <li><strong>Save Config</strong>: Downloads a <code>.json</code> file containing the current input parameters values.</li>
-          <li><strong>Load Config</strong>: Opens the browser's file examiner to upload a previously saved <code>.json</code> configuration. The simulator will automatically parse the file, populate the inputs fields, and run a simulation recalculation.</li>
+          <li><strong>Load Config</strong>: Opens the browser's file examiner to upload a previously saved <code>.json</code> configuration. The calculator will automatically parse the file, populate the inputs fields, and run a simulation recalculation.</li>
           <li><strong>Copy to Clipboard</strong>: Copies the full JSON summary results (including calculated Baud, margins, and intermediate values) for integration into external data pipelines.</li>
         </ul>
 
