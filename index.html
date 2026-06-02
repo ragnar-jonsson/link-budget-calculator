@@ -1243,8 +1243,27 @@
         try {
           const config = JSON.parse(e.target.result);
           
+          // Backward compatibility fallback: if legacy global values exist, map them to US/DS fields
+          if (config.fecBlockSize !== undefined) {
+            if (config.fecBlockSizeUs === undefined) config.fecBlockSizeUs = config.fecBlockSize;
+            if (config.fecBlockSizeDs === undefined) config.fecBlockSizeDs = config.fecBlockSize;
+          }
+          if (config.fecDataSize !== undefined) {
+            if (config.fecDataSizeUs === undefined) config.fecDataSizeUs = config.fecDataSize;
+            if (config.fecDataSizeDs === undefined) config.fecDataSizeDs = config.fecDataSize;
+          }
+          if (config.fecCorrectionEfficiency !== undefined) {
+            if (config.fecCorrectionEfficiencyUs === undefined) config.fecCorrectionEfficiencyUs = config.fecCorrectionEfficiency;
+            if (config.fecCorrectionEfficiencyDs === undefined) config.fecCorrectionEfficiencyDs = config.fecCorrectionEfficiency;
+          }
+          if (config.fecBitsPerSymbol !== undefined) {
+            if (config.fecBitsPerSymbolUs === undefined) config.fecBitsPerSymbolUs = config.fecBitsPerSymbol;
+            if (config.fecBitsPerSymbolDs === undefined) config.fecBitsPerSymbolDs = config.fecBitsPerSymbol;
+          }
+
           let loadedCount = 0;
           for (const [key, val] of Object.entries(config)) {
+            if (key === 'calculatorVersion') continue; // Skip version key since it's metadata
             const inputField = document.getElementById(key);
             if (inputField) {
               inputField.value = val;

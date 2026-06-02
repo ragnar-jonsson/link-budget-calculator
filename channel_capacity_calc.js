@@ -38,18 +38,12 @@ const DEFAULT_INPUTS = Object.freeze({
   numberOfConnectors: 4,
   modulationUs: 'PAM4',
   modulationDs: 'PAM4',
-  pamUs: 4,
-  pamDs: 4,
-  fecBlockSize: 360,
   fecBlockSizeUs: 360,
   fecBlockSizeDs: 360,
-  fecDataSize: 326,
   fecDataSizeUs: 326,
   fecDataSizeDs: 326,
-  fecCorrectionEfficiency: 1,
   fecCorrectionEfficiencyUs: 1,
   fecCorrectionEfficiencyDs: 1,
-  fecBitsPerSymbol: 10,
   fecBitsPerSymbolUs: 10,
   fecBitsPerSymbolDs: 10,
   tddDutyCycleUs: 1,
@@ -208,10 +202,10 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
   const bitsPerSymbol = mod.bitsPerSymbol;
 
   const targetBer = input.targetBer;
-  const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize) : (input.fecBlockSizeDs ?? input.fecBlockSize);
-  const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize) : (input.fecDataSizeDs ?? input.fecDataSize);
-  const eff = direction === 'us' ? (input.fecCorrectionEfficiencyUs ?? input.fecCorrectionEfficiency) : (input.fecCorrectionEfficiencyDs ?? input.fecCorrectionEfficiency);
-  const bitsPerSym = direction === 'us' ? (input.fecBitsPerSymbolUs ?? input.fecBitsPerSymbol) : (input.fecBitsPerSymbolDs ?? input.fecBitsPerSymbol);
+  const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize ?? 360) : (input.fecBlockSizeDs ?? input.fecBlockSize ?? 360);
+  const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize ?? 326) : (input.fecDataSizeDs ?? input.fecDataSize ?? 326);
+  const eff = direction === 'us' ? (input.fecCorrectionEfficiencyUs ?? input.fecCorrectionEfficiency ?? 1) : (input.fecCorrectionEfficiencyDs ?? input.fecCorrectionEfficiency ?? 1);
+  const bitsPerSym = direction === 'us' ? (input.fecBitsPerSymbolUs ?? input.fecBitsPerSymbol ?? 10) : (input.fecBitsPerSymbolDs ?? input.fecBitsPerSymbol ?? 10);
 
   const correctionSymbols = Math.floor(((n - k) / 2) * eff);
   const avgErrorsPerBlock = chiSqInv(targetBer, 2 * (correctionSymbols + 1)) / 2;
@@ -242,8 +236,8 @@ function computeSampleRateAndNyquist(direction, input) {
   const bitsPerSymbol = mod.bitsPerSymbol;
   const duty = direction === 'us' ? input.tddDutyCycleUs : input.tddDutyCycleDs;
   
-  const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize) : (input.fecBlockSizeDs ?? input.fecBlockSize);
-  const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize) : (input.fecDataSizeDs ?? input.fecDataSize);
+  const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize ?? 360) : (input.fecBlockSizeDs ?? input.fecBlockSize ?? 360);
+  const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize ?? 326) : (input.fecDataSizeDs ?? input.fecDataSize ?? 326);
   const fecMultiplier = n / k;
   
   const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / bitsPerSymbol / duty * (1 + input.framingOverhead);
