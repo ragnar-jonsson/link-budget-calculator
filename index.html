@@ -728,15 +728,20 @@
         });
       });
 
-      // 5. Connect live recalculation on inputs change
+      // 5. Connect live recalculation on inputs change (on complete update: focus loss / Enter key)
       const form = document.getElementById('configForm');
       form.querySelectorAll('input, select, textarea').forEach(element => {
-        // Debounce only for typable text/number/textarea inputs to prevent lag
-        const tagName = element.tagName.toLowerCase();
-        if (element.type === 'number' || element.type === 'text' || tagName === 'textarea') {
-          element.addEventListener('input', debounce(runSimulation, 250));
-        } else {
-          element.addEventListener('change', runSimulation);
+        // Change event fires on focus loss (blur) for text/number/textarea, and instantly for selects
+        element.addEventListener('change', runSimulation);
+
+        // For text and number inputs, trigger blur on Enter to invoke 'change' event
+        if (element.tagName.toLowerCase() === 'input' && (element.type === 'text' || element.type === 'number')) {
+          element.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              element.blur();
+            }
+          });
         }
       });
 
