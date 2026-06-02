@@ -35,7 +35,22 @@
         </svg>
         User Manual
       </a>
-      <button class="action-btn-sm" id="btnGenReport" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem;">
+      <input type="file" id="configLoader" accept=".json" style="display: none;">
+      <button class="action-btn-sm" id="btnLoadJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
+        <!-- SVG Load Icon -->
+        <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        Load Config
+      </button>
+      <button class="action-btn-sm" id="btnSaveJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
+        <!-- SVG Save Icon -->
+        <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Save Config
+      </button>
+      <button class="action-btn-sm" id="btnGenReport" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
         <!-- SVG report icon -->
         <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -561,21 +576,7 @@
           <!-- Tab: Exportable JSON config & results -->
           <div class="tab-panel" id="tabJson">
             <div class="table-actions" style="justify-content: flex-end; gap: 0.5rem;">
-              <input type="file" id="configLoader" accept=".json" style="display: none;">
-              <button class="action-btn-sm" id="btnLoadJson">
-                <!-- SVG Load Icon -->
-                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                </svg>
-                Load Config
-              </button>
-              <button class="action-btn-sm" id="btnSaveJson">
-                <!-- SVG Save Icon -->
-                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
-                </svg>
-                Save Config
-              </button>
+
               <button class="action-btn-sm" id="btnCopyJson">
                 <!-- SVG Copy Icon -->
                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -611,7 +612,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.1';
+    const CALCULATOR_VERSION = 'v0.4.2';
 
     let lastResult = null;
     let chartInstance = null;
