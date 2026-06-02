@@ -218,8 +218,13 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
   const avgErrorsPerSymbol = avgErrorsPerBlock / n;
   const requiredSlicerBer = 1 - Math.pow(1 - avgErrorsPerSymbol, bitsPerSymbol / bitsPerSym);
   const requiredGaussianSlicerBer = requiredSlicerBer - input.impulseErrorRate;
-  const normalArg = 1 - levels * requiredGaussianSlicerBer / 2 / (levels - 1);
-  const requiredSnrLinear = (levels * levels - 1) / 3 * Math.pow(normInv(normalArg), 2);
+  let requiredSnrLinear;
+  if (requiredGaussianSlicerBer <= 0) {
+    requiredSnrLinear = Infinity;
+  } else {
+    const normalArg = Math.max(1e-15, Math.min(1 - 1e-15, 1 - (levels * requiredGaussianSlicerBer) / (2 * (levels - 1))));
+    requiredSnrLinear = ((levels * levels - 1) / 3) * Math.pow(normInv(normalArg), 2);
+  }
   return {
     correctionSymbols,
     avgErrorsPerBlock,
