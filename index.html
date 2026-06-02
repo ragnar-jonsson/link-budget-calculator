@@ -156,6 +156,10 @@
                 <label for="targetBer" title="Target Bit Error Rate threshold">Target BER</label>
                 <input type="text" id="targetBer" name="targetBer">
               </div>
+              <div class="form-group full-width">
+                <label for="impulseErrorRate" title="Impulse noise error rate floor (e.g. 1e-4)">Impulse Error Rate</label>
+                <input type="text" id="impulseErrorRate" name="impulseErrorRate">
+              </div>
               <div class="form-section-title" style="grid-column: span 2; margin-top: 0.5rem; font-size: 0.75rem;">Upstream FEC (US)</div>
               <div class="form-group">
                 <label for="fecBlockSizeUs" title="FEC Block total symbol length (N) for Upstream">FEC Block US (N)</label>
@@ -785,8 +789,8 @@
         // Handle scenario metadata strings directly
         if (key === 'configTitle' || key === 'configDescription') {
           config[key] = value;
-        } else if (key === 'targetBer' || key === 'fMaxHz') {
-          // Handle scientific notation formatting (like Target BER 1e-12)
+        } else if (key === 'targetBer' || key === 'fMaxHz' || key === 'impulseErrorRate') {
+          // Handle scientific notation formatting (like Target BER 1e-12, Impulse 1e-4)
           config[key] = parseScientific(value);
         } else if (key === 'wireReflectionLimit') {
           // If value is numeric, parse it as float

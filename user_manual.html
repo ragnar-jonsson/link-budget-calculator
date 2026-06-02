@@ -430,6 +430,11 @@
               <td>Target Bit Error Rate threshold. Determines required slicer SNR in conjunction with FEC algorithms.</td>
             </tr>
             <tr>
+              <td><code>impulseErrorRate</code></td>
+              <td>1e-4</td>
+              <td>Impulse Noise Error Rate floor. Subtracted from target slicer error rate to isolate required Gaussian noise bounds. Must be less than the target slicer error rate.</td>
+            </tr>
+            <tr>
               <td><code>fecBlockSizeUs</code> / <code>fecBlockSizeDs</code></td>
               <td>360</td>
               <td>Forward Error Correction total block size symbol length (N).</td>
