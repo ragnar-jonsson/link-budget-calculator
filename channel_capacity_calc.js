@@ -48,7 +48,8 @@ const DEFAULT_INPUTS = Object.freeze({
   fecBitsPerSymbolDs: 10,
   tddDutyCycleUs: 1,
   tddDutyCycleDs: 1,
-  framingOverhead: 0.01875,
+  framingOverheadUs: 0.01875,
+  framingOverheadDs: 0.01875,
   psdMaskUs: 'PSD_ZOH',
   psdMaskDs: 'PSD_ZOH',
   txPowerDbmUs: 0,
@@ -240,7 +241,8 @@ function computeSampleRateAndNyquist(direction, input) {
   const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize ?? 326) : (input.fecDataSizeDs ?? input.fecDataSize ?? 326);
   const fecMultiplier = n / k;
   
-  const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / bitsPerSymbol / duty * (1 + input.framingOverhead);
+  const overhead = direction === 'us' ? (input.framingOverheadUs ?? input.framingOverhead ?? 0.01875) : (input.framingOverheadDs ?? input.framingOverhead ?? 0.01875);
+  const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / bitsPerSymbol / duty * (1 + overhead);
   return { sampleRateHz, nyquistHz: sampleRateHz / 2 };
 }
 

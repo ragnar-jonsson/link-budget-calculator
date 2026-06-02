@@ -204,8 +204,20 @@
                 <input type="number" id="tddDutyCycleDs" name="tddDutyCycleDs" min="0.01" max="1" step="0.01">
               </div>
               <div class="form-group">
-                <label for="framingOverhead" title="Coding overhead margin">Framing Overhead</label>
-                <input type="number" id="framingOverhead" name="framingOverhead" min="0" max="0.5" step="0.001">
+                <label for="framingOverheadUs" title="Upstream Coding overhead margin">Framing Overhead US</label>
+                <input type="number" id="framingOverheadUs" name="framingOverheadUs" min="0" max="0.5" step="0.001">
+              </div>
+              <div class="form-group">
+                <label for="targetSymbolRateGbaudUs" title="Target Symbol Rate US (updates Framing Overhead US)">Symbol Rate US (GBaud)</label>
+                <input type="number" id="targetSymbolRateGbaudUs" name="targetSymbolRateGbaudUs" min="0" step="0.0001">
+              </div>
+              <div class="form-group">
+                <label for="framingOverheadDs" title="Downstream Coding overhead margin">Framing Overhead DS</label>
+                <input type="number" id="framingOverheadDs" name="framingOverheadDs" min="0" max="0.5" step="0.001">
+              </div>
+              <div class="form-group">
+                <label for="targetSymbolRateGbaudDs" title="Target Symbol Rate DS (updates Framing Overhead DS)">Symbol Rate DS (GBaud)</label>
+                <input type="number" id="targetSymbolRateGbaudDs" name="targetSymbolRateGbaudDs" min="0" step="0.0001">
               </div>
               <div class="form-group">
                 <label for="temperatureC" title="Operational temperature of the cable in degrees Celsius">Temperature (°C)</label>
@@ -599,7 +611,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v1.3.0';
+    const CALCULATOR_VERSION = 'v0.4.0';
 
     let lastResult = null;
     let chartInstance = null;
@@ -732,6 +744,64 @@
         });
       });
 
+      // Setup bidirectional dependency for Symbol Rate <-> Framing Overhead (US)
+      const gbaudInputUs = document.getElementById('targetSymbolRateGbaudUs');
+      if (gbaudInputUs) {
+        gbaudInputUs.addEventListener('change', (e) => {
+          const gbaud = parseFloat(e.target.value);
+          if (isNaN(gbaud)) return;
+          
+          const formData = new FormData(document.getElementById('configForm'));
+          const config = {};
+          formData.forEach((value, key) => {
+            if (key === 'targetSymbolRateGbaudUs') return;
+            config[key] = isNaN(value) || value.trim() === '' ? value : parseFloat(value);
+          });
+          const input = { ...window.DEFAULT_INPUTS, ...config };
+          
+          const dataRateGbps = input.dataRateGbpsUs;
+          const modName = input.modulationUs ?? 'PAM4';
+          const mod = window.MODULATION_TABLE[modName] || window.MODULATION_TABLE['PAM4'];
+          const bitsPerSymbol = mod.bitsPerSymbol;
+          const duty = input.tddDutyCycleUs;
+          const n = input.fecBlockSizeUs ?? 360;
+          const k = input.fecDataSizeUs ?? 326;
+          const fecMultiplier = n / k;
+          
+          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty) / (dataRateGbps * 1e9 * fecMultiplier) - 1;
+          document.getElementById('framingOverheadUs').value = Math.max(0, newOverhead).toFixed(6);
+        });
+      }
+
+      // Setup bidirectional dependency for Symbol Rate <-> Framing Overhead (DS)
+      const gbaudInputDs = document.getElementById('targetSymbolRateGbaudDs');
+      if (gbaudInputDs) {
+        gbaudInputDs.addEventListener('change', (e) => {
+          const gbaud = parseFloat(e.target.value);
+          if (isNaN(gbaud)) return;
+          
+          const formData = new FormData(document.getElementById('configForm'));
+          const config = {};
+          formData.forEach((value, key) => {
+            if (key === 'targetSymbolRateGbaudDs') return;
+            config[key] = isNaN(value) || value.trim() === '' ? value : parseFloat(value);
+          });
+          const input = { ...window.DEFAULT_INPUTS, ...config };
+          
+          const dataRateGbps = input.dataRateGbpsDs;
+          const modName = input.modulationDs ?? 'PAM4';
+          const mod = window.MODULATION_TABLE[modName] || window.MODULATION_TABLE['PAM4'];
+          const bitsPerSymbol = mod.bitsPerSymbol;
+          const duty = input.tddDutyCycleDs;
+          const n = input.fecBlockSizeDs ?? 360;
+          const k = input.fecDataSizeDs ?? 326;
+          const fecMultiplier = n / k;
+          
+          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty) / (dataRateGbps * 1e9 * fecMultiplier) - 1;
+          document.getElementById('framingOverheadDs').value = Math.max(0, newOverhead).toFixed(6);
+        });
+      }
+
       // 5. Connect live recalculation on inputs change (on complete update: focus loss / Enter key)
       const form = document.getElementById('configForm');
       form.querySelectorAll('input, select, textarea').forEach(element => {
@@ -805,6 +875,25 @@
         const result = window.compute(config);
         lastResult = result;
         updateDashboard(result);
+
+        // Update Symbol Rate fields if they haven't just been modified by the user directly
+        const gbaudInputUs = document.getElementById('targetSymbolRateGbaudUs');
+        if (gbaudInputUs) {
+           const calculatedGbaudUs = result.sampleRateHzUs / 1e9;
+           const currentValUs = parseFloat(gbaudInputUs.value);
+           if (isNaN(currentValUs) || Math.abs(currentValUs - calculatedGbaudUs) > 1e-5) {
+              gbaudInputUs.value = calculatedGbaudUs.toFixed(6);
+           }
+        }
+
+        const gbaudInputDs = document.getElementById('targetSymbolRateGbaudDs');
+        if (gbaudInputDs) {
+           const calculatedGbaudDs = result.sampleRateHzDs / 1e9;
+           const currentValDs = parseFloat(gbaudInputDs.value);
+           if (isNaN(currentValDs) || Math.abs(currentValDs - calculatedGbaudDs) > 1e-5) {
+              gbaudInputDs.value = calculatedGbaudDs.toFixed(6);
+           }
+        }
       } catch (err) {
         console.error(err);
         alert(`Computation Error: ${err.message}`);
@@ -1264,6 +1353,10 @@
             if (config.fecBitsPerSymbolUs === undefined) config.fecBitsPerSymbolUs = config.fecBitsPerSymbol;
             if (config.fecBitsPerSymbolDs === undefined) config.fecBitsPerSymbolDs = config.fecBitsPerSymbol;
           }
+          if (config.framingOverhead !== undefined) {
+            if (config.framingOverheadUs === undefined) config.framingOverheadUs = config.framingOverhead;
+            if (config.framingOverheadDs === undefined) config.framingOverheadDs = config.framingOverhead;
+          }
 
           let loadedCount = 0;
           for (const [key, val] of Object.entries(config)) {
@@ -1466,7 +1559,8 @@
         
         const link = document.createElement('a');
         link.href = url;
-        link.download = `link_budget_report_${lastResult.input.cableModel}_${lastResult.input.cableLengthM}m.html`;
+        const titleClean = (lastResult.input.configTitle || 'config').trim().replace(/[^a-zA-Z0-9_-]+/g, '_');
+        link.download = `Link_Budget_Calculator_${titleClean}.html`;
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
