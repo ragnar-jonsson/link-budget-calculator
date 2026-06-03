@@ -229,7 +229,7 @@
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div class="badge-version">v1.3.0 (IEEE 802.3ch / 3cy / 3dm)</div>
+      <div class="badge-version">v0.4.6 (IEEE 802.3ch / 3cy / 3dm)</div>
       <a href="index.html" class="action-btn-sm" style="text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
         <!-- Return back icon -->
         <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -267,7 +267,7 @@
       <section class="manual-section" id="sectionIntro">
         <h2>1. Introduction & Overview</h2>
         <p>
-          Welcome to the <strong>Link Budget Calculator</strong> (Version 1.3.0) User Manual. This application is a web-based, baseband channel capacity calculation dashboard designed for hardware design and transmission engineering validation.
+          Welcome to the <strong>Link Budget Calculator</strong> (Version 0.4.6) User Manual. This application is a web-based, baseband channel capacity calculation dashboard designed for hardware design and transmission engineering validation.
         </p>
         <p>
           The calculator is designed to evaluate high-speed automotive communication standards over physical cable models, specifically adhering to guidelines within:
@@ -455,9 +455,14 @@
               <td>Time Division Duplexing (TDD) duty cycle fraction (0.01 to 1.0) representing active transmission windows. Reducing below 1.0 increases baud rate to compensate.</td>
             </tr>
             <tr>
-              <td><code>framingOverhead</code></td>
+              <td><code>symbolRateGBaudUs</code> / <code>symbolRateGBaudDs</code></td>
+              <td>(Auto-calculated)</td>
+              <td>Target symbol rate (Baud) for the link. Entering a value here will automatically calculate and overwrite the respective <code>framingOverhead</code> to sync the link budget.</td>
+            </tr>
+            <tr>
+              <td><code>framingOverheadUs</code> / <code>framingOverheadDs</code></td>
               <td>0.01875 (1.875%)</td>
-              <td>Coding and formatting overhead ratio, scaling required line baud rates.</td>
+              <td>Coding and formatting overhead ratio. Modifying this will automatically re-calculate the target Symbol Rate to keep parameters in sync.</td>
             </tr>
             <tr>
               <td><code>temperatureC</code></td>
@@ -564,14 +569,14 @@
       <section class="manual-section" id="sectionFeatures">
         <h2>6. Advanced Functions</h2>
         
-        <h3>6.1 Backup & Config JSON</h3>
+        <h3>6.1 Backup, Config & Output JSON</h3>
         <p>
-          The **JSON Config** tab allows developers to inspect, export, or restore calculator states:
+          Developers can inspect, export, or restore calculator states using the top navigation header and the **JSON Config** tab:
         </p>
         <ul>
-          <li><strong>Save Config</strong>: Downloads a <code>.json</code> file containing the current input parameters values.</li>
-          <li><strong>Load Config</strong>: Opens the browser's file examiner to upload a previously saved <code>.json</code> configuration. The calculator will automatically parse the file, populate the inputs fields, and run a simulation recalculation.</li>
-          <li><strong>Copy to Clipboard</strong>: Copies the full JSON summary results (including calculated Baud, margins, and intermediate values) for integration into external data pipelines.</li>
+          <li><strong>Save Config (Header)</strong>: Downloads a <code>.json</code> file containing the current input parameter values for backup or sharing.</li>
+          <li><strong>Load Config (Header)</strong>: Opens the browser's file examiner to upload a previously saved <code>.json</code> configuration. The calculator automatically parses the file, populates the fields, and runs a recalculation.</li>
+          <li><strong>Copy to Clipboard (JSON Tab)</strong>: Copies the full JSON output summary (including calculated Baud, margins, and intermediate values) from the JSON Config tab for integration into external data pipelines.</li>
         </ul>
 
         <h3>6.2 Print-Ready Simulation Reports</h3>
@@ -581,7 +586,7 @@
         <ol>
           <li><strong>Offscreen Compilation</strong>: Instantiates a temporary, hidden Chart.js context to draw SNR, Insertion Loss, and Transmit PSD profiles in a high-contrast, light-themed format suitable for printing.</li>
           <li><strong>Waveform Extraction</strong>: Extracts base64 image strings from the offscreen canvases.</li>
-          <li><strong>Standalone Document Assembly</strong>: Compiles a print-friendly HTML document incorporating the date metadata, standard introductory notices, configuration summaries, performance grids, PASS/FAIL cards, and the embedded chart images.</li>
+          <li><strong>Standalone Document Assembly</strong>: Compiles a print-friendly HTML document incorporating the date metadata, configuration summaries, performance grids, Detailed Budget Breakdowns, Channel Losses, Modulation references, PASS/FAIL cards, and the embedded chart images.</li>
           <li><strong>Download Trigger</strong>: Initiates a browser download for the compiled standalone HTML file.</li>
         </ol>
       </section>
