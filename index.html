@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Channel Capacity Calculator | Multi-Gigabit Link Budget Analyzer</title>
+  <title>Link Budget Analyzer</title>
   <link rel="stylesheet" href="index.css">
   <!-- Chart.js CDN for visual data representation -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -616,7 +616,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.4';
+    const CALCULATOR_VERSION = 'v0.4.5';
 
     let lastResult = null;
     let chartInstance = null;
@@ -1511,8 +1511,8 @@
       </tr>
       <tr>
         <td>FEC Configuration (N, K)</td>
-        <td>${lastResult.input.fecBlockSizeUs} / ${lastResult.input.fecDataSizeUs} (t=${lastResult.fecUs.correctionSymbols})</td>
-        <td>${lastResult.input.fecBlockSizeDs} / ${lastResult.input.fecDataSizeDs} (t=${lastResult.fecDs.correctionSymbols})</td>
+        <td>${lastResult.input.fecBlockSizeUs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeUs ?? lastResult.input.fecDataSize} (t=${lastResult.fecUs.correctionSymbols})</td>
+        <td>${lastResult.input.fecBlockSizeDs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeDs ?? lastResult.input.fecDataSize} (t=${lastResult.fecDs.correctionSymbols})</td>
       </tr>
       <tr>
         <td>Tx Power Level</td>
@@ -1547,6 +1547,21 @@
       </tr>
     </thead>
     <tbody>
+      <tr>
+        <td>Nyquist Frequency</td>
+        <td>${(lastResult.nyquistHzUs / 1e9).toFixed(3)} GHz</td>
+        <td>${(lastResult.nyquistHzDs / 1e9).toFixed(3)} GHz</td>
+      </tr>
+      <tr>
+        <td>Symbol Rate (Baud)</td>
+        <td>${(lastResult.sampleRateHzUs / 1e9).toFixed(3)} GBaud</td>
+        <td>${(lastResult.sampleRateHzDs / 1e9).toFixed(3)} GBaud</td>
+      </tr>
+      <tr>
+        <td>FEC Config (N, K)</td>
+        <td>${lastResult.input.fecBlockSizeUs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeUs ?? lastResult.input.fecDataSize} (t=${lastResult.fecUs.correctionSymbols})</td>
+        <td>${lastResult.input.fecBlockSizeDs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeDs ?? lastResult.input.fecDataSize} (t=${lastResult.fecDs.correctionSymbols})</td>
+      </tr>
       <tr>
         <td>Theoretical Slicer SNR</td>
         <td>${lastResult.theoreticalSlicerSnrDbUs.toFixed(2)} dB</td>
