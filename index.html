@@ -616,7 +616,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.5';
+    const CALCULATOR_VERSION = 'v0.4.6';
 
     let lastResult = null;
     let chartInstance = null;
@@ -1589,6 +1589,67 @@
       </tr>
     </tbody>
   </table>
+
+  <div class="grid" style="margin-top: 30px;">
+    <div>
+      <div class="section-title" style="margin-top: 0;">Common Channel Losses @ Nyquist</div>
+      <table class="metric-table">
+        <tbody>
+          <tr>
+            <td>Cable Insertion Loss @ Nyq Us</td>
+            <td>${lastResult.cableLossNyquistDbUs.toFixed(2)} dB</td>
+          </tr>
+          <tr>
+            <td>Total Channel Insertion Loss @ Nyq Us</td>
+            <td>${lastResult.channelInsertionLossNyquistDbUs.toFixed(2)} dB</td>
+          </tr>
+          <tr>
+            <td>Wire Echo Baseline Limit</td>
+            <td>${lastResult.input.wireReflectionLimit}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="section-title" style="margin-top: 0;">Selected Modulation Schema Reference</div>
+      <table class="metric-table">
+        <thead>
+          <tr>
+            <th>Parameter</th>
+            <th>Upstream</th>
+            <th>Downstream</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Modulation Schema</td>
+            <td>${lastResult.modulationUs.name}</td>
+            <td>${lastResult.modulationDs.name}</td>
+          </tr>
+          <tr>
+            <td>Bits per Symbol</td>
+            <td>${lastResult.modulationUs.bitsPerSymbol}</td>
+            <td>${lastResult.modulationDs.bitsPerSymbol}</td>
+          </tr>
+          <tr>
+            <td>Symbols per Sample (Bit)</td>
+            <td>${lastResult.modulationUs.symbolsPerBit}</td>
+            <td>${lastResult.modulationDs.symbolsPerBit}</td>
+          </tr>
+          <tr>
+            <td>Slicer Decision Levels</td>
+            <td>${lastResult.modulationUs.decisionLevels}</td>
+            <td>${lastResult.modulationDs.decisionLevels}</td>
+          </tr>
+          <tr>
+            <td>Transmit PSD Base Shape</td>
+            <td>${lastResult.input.psdMaskUs}</td>
+            <td>${lastResult.input.psdMaskDs}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
   <div class="section-title">Visual Waveforms & Profiles</div>
   
