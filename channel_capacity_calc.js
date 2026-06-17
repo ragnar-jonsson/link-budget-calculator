@@ -220,6 +220,10 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
     const normalArg = Math.max(1e-15, Math.min(1 - 1e-15, 1 - (levels * requiredGaussianSlicerBer) / (2 * (levels - 1))));
     requiredSnrLinear = ((levels * levels - 1) / 3) * Math.pow(normInv(normalArg), 2);
   }
+  const totalDataBits = k * bitsPerSym;
+  const numBlocks64b65b = Math.floor(totalDataBits / 65);
+  const numOverheadBits = totalDataBits % 65;
+
   return {
     correctionSymbols,
     avgErrorsPerBlock,
@@ -227,7 +231,10 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
     requiredSlicerBer,
     requiredGaussianSlicerBer,
     requiredSnrLinear,
-    requiredSnrDb: linearToDb(requiredSnrLinear)
+    requiredSnrDb: linearToDb(requiredSnrLinear),
+    totalDataBits,
+    numBlocks64b65b,
+    numOverheadBits
   };
 }
 

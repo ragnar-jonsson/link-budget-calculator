@@ -344,6 +344,10 @@
                       <td id="tdFecUs" style="text-align: right; font-family: var(--font-mono);">--</td>
                     </tr>
                     <tr>
+                      <td>&nbsp;&nbsp;Data Payload (K) Breakdown</td>
+                      <td id="tdFecPayloadUs" style="text-align: right; font-family: var(--font-mono); font-size: 0.85em; color: var(--text-muted);">--</td>
+                    </tr>
+                    <tr>
                       <td>Theoretical Slicer SNR</td>
                       <td id="tdTheoSnrUs" style="text-align: right; font-family: var(--font-mono);">--</td>
                     </tr>
@@ -385,6 +389,10 @@
                     <tr>
                       <td>FEC Config (N, K)</td>
                       <td id="tdFecDs" style="text-align: right; font-family: var(--font-mono);">--</td>
+                    </tr>
+                    <tr>
+                      <td>&nbsp;&nbsp;Data Payload (K) Breakdown</td>
+                      <td id="tdFecPayloadDs" style="text-align: right; font-family: var(--font-mono); font-size: 0.85em; color: var(--text-muted);">--</td>
                     </tr>
                     <tr>
                       <td>Theoretical Slicer SNR</td>
@@ -956,10 +964,12 @@
       const nUs = result.input.fecBlockSizeUs ?? result.input.fecBlockSize;
       const kUs = result.input.fecDataSizeUs ?? result.input.fecDataSize;
       document.getElementById('tdFecUs').textContent = `${nUs} / ${kUs} (t=${result.fecUs.correctionSymbols})`;
+      document.getElementById('tdFecPayloadUs').textContent = `${result.fecUs.totalDataBits} bits = ${result.fecUs.numBlocks64b65b} × 64B/65B + ${result.fecUs.numOverheadBits} overhead`;
 
       const nDs = result.input.fecBlockSizeDs ?? result.input.fecBlockSize;
       const kDs = result.input.fecDataSizeDs ?? result.input.fecDataSize;
       document.getElementById('tdFecDs').textContent = `${nDs} / ${kDs} (t=${result.fecDs.correctionSymbols})`;
+      document.getElementById('tdFecPayloadDs').textContent = `${result.fecDs.totalDataBits} bits = ${result.fecDs.numBlocks64b65b} × 64B/65B + ${result.fecDs.numOverheadBits} overhead`;
 
       document.getElementById('tdTheoSnrUs').textContent = `${result.theoreticalSlicerSnrDbUs.toFixed(2)} dB`;
       document.getElementById('tdTheoSnrDs').textContent = `${result.theoreticalSlicerSnrDbDs.toFixed(2)} dB`;
@@ -1522,6 +1532,11 @@
         <td>${lastResult.input.fecBlockSizeDs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeDs ?? lastResult.input.fecDataSize} (t=${lastResult.fecDs.correctionSymbols})</td>
       </tr>
       <tr>
+        <td style="padding-left: 20px; color: #555; font-size: 0.9em;">Data Payload (K) Breakdown</td>
+        <td style="color: #555; font-size: 0.9em;">${lastResult.fecUs.totalDataBits} bits = ${lastResult.fecUs.numBlocks64b65b} × 64B/65B + ${lastResult.fecUs.numOverheadBits} overhead</td>
+        <td style="color: #555; font-size: 0.9em;">${lastResult.fecDs.totalDataBits} bits = ${lastResult.fecDs.numBlocks64b65b} × 64B/65B + ${lastResult.fecDs.numOverheadBits} overhead</td>
+      </tr>
+      <tr>
         <td>Tx Power Level</td>
         <td>${lastResult.input.txPowerDbmUs} dBm</td>
         <td>${lastResult.input.txPowerDbmDs} dBm</td>
@@ -1568,6 +1583,11 @@
         <td>FEC Config (N, K)</td>
         <td>${lastResult.input.fecBlockSizeUs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeUs ?? lastResult.input.fecDataSize} (t=${lastResult.fecUs.correctionSymbols})</td>
         <td>${lastResult.input.fecBlockSizeDs ?? lastResult.input.fecBlockSize} / ${lastResult.input.fecDataSizeDs ?? lastResult.input.fecDataSize} (t=${lastResult.fecDs.correctionSymbols})</td>
+      </tr>
+      <tr>
+        <td style="padding-left: 20px; color: #555; font-size: 0.9em;">Data Payload (K) Breakdown</td>
+        <td style="color: #555; font-size: 0.9em;">${lastResult.fecUs.totalDataBits} bits = ${lastResult.fecUs.numBlocks64b65b} × 64B/65B + ${lastResult.fecUs.numOverheadBits} overhead</td>
+        <td style="color: #555; font-size: 0.9em;">${lastResult.fecDs.totalDataBits} bits = ${lastResult.fecDs.numBlocks64b65b} × 64B/65B + ${lastResult.fecDs.numOverheadBits} overhead</td>
       </tr>
       <tr>
         <td>Theoretical Slicer SNR</td>
