@@ -36,21 +36,21 @@
         User Manual
       </a>
       <input type="file" id="configLoader" accept=".json" style="display: none;">
-      <button class="action-btn-sm" id="btnLoadJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
+      <button type="button" class="action-btn-sm" id="btnLoadJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
         <!-- SVG Load Icon -->
         <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
         </svg>
         Load Config
       </button>
-      <button class="action-btn-sm" id="btnSaveJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
+      <button type="button" class="action-btn-sm" id="btnSaveJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
         <!-- SVG Save Icon -->
         <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
         </svg>
         Save Config
       </button>
-      <button class="action-btn-sm" id="btnGenReport" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
+      <button type="button" class="action-btn-sm" id="btnGenReport" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center;">
         <!-- SVG report icon -->
         <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -65,7 +65,7 @@
   </header>
 
   <!-- Main Application Layout -->
-  <form id="configForm" class="app-container">
+  <form id="configForm" class="app-container" onsubmit="event.preventDefault(); return false;">
 
     <!-- Left Column: Simulation Inputs Form -->
     <aside class="card">
@@ -301,19 +301,19 @@
       <section class="card" style="flex: 1;">
         <div class="tabs-container">
           <div class="tab-list">
-            <button class="tab-btn active" data-tab="tabCharts">Charts & Profiles</button>
-            <button class="tab-btn" data-tab="tabBudget">Detailed Budget</button>
-            <button class="tab-btn" data-tab="tabTable">Frequency Grid</button>
-            <button class="tab-btn" data-tab="tabFrameEditor">Frame Editor</button>
-            <button class="tab-btn" data-tab="tabJson">JSON Config</button>
+            <button type="button" class="tab-btn active" data-tab="tabCharts">Charts & Profiles</button>
+            <button type="button" class="tab-btn" data-tab="tabBudget">Detailed Budget</button>
+            <button type="button" class="tab-btn" data-tab="tabTable">Frequency Grid</button>
+            <button type="button" class="tab-btn" data-tab="tabFrameEditor">Frame Editor</button>
+            <button type="button" class="tab-btn" data-tab="tabJson">JSON Config</button>
           </div>
 
           <!-- Tab: Interactive Charts -->
           <div class="tab-panel active" id="tabCharts">
             <div class="chart-controls">
-              <button class="chart-toggle-btn active" data-chart="snr">SNR Profile</button>
-              <button class="chart-toggle-btn" data-chart="loss">Insertion Loss Profiles</button>
-              <button class="chart-toggle-btn" data-chart="psd">Transmit PSD</button>
+              <button type="button" class="chart-toggle-btn active" data-chart="snr">SNR Profile</button>
+              <button type="button" class="chart-toggle-btn" data-chart="loss">Insertion Loss Profiles</button>
+              <button type="button" class="chart-toggle-btn" data-chart="psd">Transmit PSD</button>
             </div>
             <div class="chart-wrapper" id="chartWrapper">
               <canvas id="chartCanvas"></canvas>
@@ -491,7 +491,7 @@
                 </svg>
                 <input type="text" id="tableSearch" class="search-input" placeholder="Search frequency or value...">
               </div>
-              <button class="action-btn-sm" id="btnCsvDownload">
+              <button type="button" class="action-btn-sm" id="btnCsvDownload">
                 <!-- SVG Download Icon -->
                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
@@ -609,7 +609,7 @@
           <!-- Tab: Exportable JSON config & results -->
           <div class="tab-panel" id="tabJson">
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-              <button class="btn" id="btnCopyJson">
+              <button type="button" class="btn" id="btnCopyJson">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
