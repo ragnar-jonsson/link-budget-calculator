@@ -221,8 +221,11 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
     requiredSnrLinear = ((levels * levels - 1) / 3) * Math.pow(normInv(normalArg), 2);
   }
   const totalDataBits = k * bitsPerSym;
-  const numBlocks64b65b = Math.floor(totalDataBits / 65);
-  const numOverheadBits = totalDataBits % 65;
+  let numBlocks64b65b = direction === 'us' ? input.fecNumBlocksUs : input.fecNumBlocksDs;
+  if (numBlocks64b65b === undefined || isNaN(numBlocks64b65b)) {
+      numBlocks64b65b = Math.floor(totalDataBits / 65);
+  }
+  const numOverheadBits = totalDataBits - (numBlocks64b65b * 65);
 
   return {
     correctionSymbols,
@@ -246,10 +249,18 @@ function computeSampleRateAndNyquist(direction, input) {
   
   const n = direction === 'us' ? (input.fecBlockSizeUs ?? input.fecBlockSize ?? 360) : (input.fecBlockSizeDs ?? input.fecBlockSize ?? 360);
   const k = direction === 'us' ? (input.fecDataSizeUs ?? input.fecDataSize ?? 326) : (input.fecDataSizeDs ?? input.fecDataSize ?? 326);
-  const fecMultiplier = n / k;
+  const bitsPerSym = direction === 'us' ? (input.fecBitsPerSymbolUs ?? input.fecBitsPerSymbol ?? 10) : (input.fecBitsPerSymbolDs ?? input.fecBitsPerSymbol ?? 10);
   
-  const overhead = direction === 'us' ? (input.framingOverheadUs ?? input.framingOverhead ?? 0.01875) : (input.framingOverheadDs ?? input.framingOverhead ?? 0.01875);
-  const sampleRateHz = dataRateGbps * 1e9 * fecMultiplier / bitsPerSymbol / duty * (1 + overhead);
+  let numBlocks = direction === 'us' ? input.fecNumBlocksUs : input.fecNumBlocksDs;
+  if (numBlocks === undefined || isNaN(numBlocks)) {
+      numBlocks = Math.floor((k * bitsPerSym) / 65);
+  }
+  
+  const netDataBitsPerFrame = numBlocks * 64;
+  const lineDataBitsPerFrame = n * bitsPerSym;
+  
+  const overhead = direction === 'us' ? input.framingOverheadUs : input.framingOverheadDs;
+  const sampleRateHz = (dataRateGbps * 1e9 / netDataBitsPerFrame) * lineDataBitsPerFrame / bitsPerSymbol / duty * (1 + overhead);
   return { sampleRateHz, nyquistHz: sampleRateHz / 2 };
 }
 

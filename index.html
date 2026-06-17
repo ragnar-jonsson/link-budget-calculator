@@ -543,6 +543,14 @@
                 <label for="fecBitsPerSymbolUs" title="Bits per symbol for Upstream">Bits/Sym US</label>
                 <input type="number" id="fecBitsPerSymbolUs" name="fecBitsPerSymbolUs" min="1" step="1">
               </div>
+              <div class="form-group">
+                <label for="fecNumBlocksUs" title="Number of 64B/65B blocks in the FEC payload">64B/65B Blocks US</label>
+                <input type="number" id="fecNumBlocksUs" name="fecNumBlocksUs" min="0" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecOverheadBitsUs" title="Overhead bits remaining in the FEC payload">Overhead Bits US</label>
+                <input type="number" id="fecOverheadBitsUs" name="fecOverheadBitsUs" min="0" max="64" step="1" disabled>
+              </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Downstream FEC (DS)</div>
               <div class="form-group">
@@ -560,6 +568,14 @@
               <div class="form-group">
                 <label for="fecBitsPerSymbolDs" title="Bits per symbol for Downstream">Bits/Sym DS</label>
                 <input type="number" id="fecBitsPerSymbolDs" name="fecBitsPerSymbolDs" min="1" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecNumBlocksDs" title="Number of 64B/65B blocks in the FEC payload">64B/65B Blocks DS</label>
+                <input type="number" id="fecNumBlocksDs" name="fecNumBlocksDs" min="0" step="1">
+              </div>
+              <div class="form-group">
+                <label for="fecOverheadBitsDs" title="Overhead bits remaining in the FEC payload">Overhead Bits DS</label>
+                <input type="number" id="fecOverheadBitsDs" name="fecOverheadBitsDs" min="0" max="64" step="1" disabled>
               </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Framing & Duplexing</div>
@@ -786,9 +802,14 @@
           const duty = input.tddDutyCycleUs;
           const n = input.fecBlockSizeUs ?? 360;
           const k = input.fecDataSizeUs ?? 326;
-          const fecMultiplier = n / k;
+          const bitsPerSym = input.fecBitsPerSymbolUs ?? 10;
+          let numBlocks = input.fecNumBlocksUs;
+          if (numBlocks === undefined || isNaN(numBlocks)) {
+              numBlocks = Math.floor((k * bitsPerSym) / 65);
+          }
+          const utilization = (numBlocks * 64) / (n * bitsPerSym);
           
-          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty) / (dataRateGbps * 1e9 * fecMultiplier) - 1;
+          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty * utilization) / (dataRateGbps * 1e9) - 1;
           document.getElementById('framingOverheadUs').value = Math.max(0, newOverhead).toFixed(6);
         });
       }
@@ -815,12 +836,58 @@
           const duty = input.tddDutyCycleDs;
           const n = input.fecBlockSizeDs ?? 360;
           const k = input.fecDataSizeDs ?? 326;
-          const fecMultiplier = n / k;
+          const bitsPerSym = input.fecBitsPerSymbolDs ?? 10;
+          let numBlocks = input.fecNumBlocksDs;
+          if (numBlocks === undefined || isNaN(numBlocks)) {
+              numBlocks = Math.floor((k * bitsPerSym) / 65);
+          }
+          const utilization = (numBlocks * 64) / (n * bitsPerSym);
           
-          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty) / (dataRateGbps * 1e9 * fecMultiplier) - 1;
+          const newOverhead = (gbaud * 1e9 * bitsPerSymbol * duty * utilization) / (dataRateGbps * 1e9) - 1;
           document.getElementById('framingOverheadDs').value = Math.max(0, newOverhead).toFixed(6);
         });
       }
+
+      // Sync FEC block sizes and overheads
+      function syncFecBlocks(direction) {
+        const suffix = direction === 'us' ? 'Us' : 'Ds';
+        const kInput = document.getElementById(`fecDataSize${suffix}`);
+        const bpsInput = document.getElementById(`fecBitsPerSymbol${suffix}`);
+        const blocksInput = document.getElementById(`fecNumBlocks${suffix}`);
+        const overheadInput = document.getElementById(`fecOverheadBits${suffix}`);
+        if (!kInput || !bpsInput || !blocksInput || !overheadInput) return;
+
+        const k = parseFloat(kInput.value);
+        const bps = parseFloat(bpsInput.value);
+        const userBlocksStr = blocksInput.value;
+        const totalBits = k * bps;
+        if (!isNaN(totalBits)) {
+            let numBlocks;
+            if (document.activeElement === blocksInput && userBlocksStr !== '') {
+                // User is editing blocks, just update overhead
+                numBlocks = parseFloat(userBlocksStr);
+            } else {
+                // Auto-calculate blocks from K
+                numBlocks = Math.floor(totalBits / 65);
+                if (document.activeElement !== blocksInput) {
+                    blocksInput.value = numBlocks;
+                }
+            }
+            if (!isNaN(numBlocks)) {
+                overheadInput.value = totalBits - (numBlocks * 65);
+            }
+        }
+      }
+
+      ['us', 'ds'].forEach(dir => {
+        const suffix = dir === 'us' ? 'Us' : 'Ds';
+        const kInput = document.getElementById(`fecDataSize${suffix}`);
+        const bpsInput = document.getElementById(`fecBitsPerSymbol${suffix}`);
+        const blocksInput = document.getElementById(`fecNumBlocks${suffix}`);
+        if (kInput) kInput.addEventListener('input', () => syncFecBlocks(dir));
+        if (bpsInput) bpsInput.addEventListener('input', () => syncFecBlocks(dir));
+        if (blocksInput) blocksInput.addEventListener('input', () => syncFecBlocks(dir));
+      });
 
       // 5. Connect live recalculation on inputs change (on complete update: focus loss / Enter key)
       const form = document.getElementById('configForm');
