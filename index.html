@@ -526,6 +526,12 @@
           <!-- Tab: Frame Editor -->
           <div class="tab-panel" id="tabFrameEditor">
             <div class="form-grid" style="padding: 1rem; max-width: 800px;">
+              <div style="grid-column: span 2; margin-bottom: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; cursor: pointer;">
+                  <input type="checkbox" id="syncSymmetricFec" name="syncSymmetricFec">
+                  Sync Downstream to Upstream (Symmetric System)
+                </label>
+              </div>
               <div class="form-section-title" style="grid-column: span 2; font-size: 1rem;">Upstream FEC (US)</div>
               <div class="form-group">
                 <label for="fecBlockSizeUs" title="FEC Block total symbol length (N) for Upstream">FEC Block US (N)</label>
@@ -647,7 +653,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.9';
+    const CALCULATOR_VERSION = 'v0.4.10';
 
     let lastResult = null;
     let chartInstance = null;
@@ -888,6 +894,44 @@
         if (bpsInput) bpsInput.addEventListener('input', () => syncFecBlocks(dir));
         if (blocksInput) blocksInput.addEventListener('input', () => syncFecBlocks(dir));
       });
+
+      // Sync US to DS for symmetric systems
+      const syncSymmetricCheckbox = document.getElementById('syncSymmetricFec');
+      const syncFields = [
+          'fecBlockSize', 'fecDataSize', 'fecCorrectionEfficiency', 
+          'fecBitsPerSymbol', 'fecNumBlocks', 'fecOverheadBits',
+          'tddDutyCycle', 'framingOverhead', 'targetSymbolRateGbaud'
+      ];
+      function handleSymmetricSync() {
+          if (!syncSymmetricCheckbox || !syncSymmetricCheckbox.checked) return;
+          syncFields.forEach(baseName => {
+              const usElem = document.getElementById(`${baseName}Us`);
+              const dsElem = document.getElementById(`${baseName}Ds`);
+              if (usElem && dsElem) {
+                  dsElem.value = usElem.value;
+              }
+          });
+          syncFecBlocks('ds');
+      }
+      if (syncSymmetricCheckbox) {
+          syncSymmetricCheckbox.addEventListener('change', () => {
+              if (syncSymmetricCheckbox.checked) {
+                  handleSymmetricSync();
+                  runSimulation();
+              }
+          });
+          syncFields.forEach(baseName => {
+              const usElem = document.getElementById(`${baseName}Us`);
+              if (usElem) {
+                  usElem.addEventListener('change', () => {
+                      if (syncSymmetricCheckbox.checked) {
+                          handleSymmetricSync();
+                          runSimulation();
+                      }
+                  });
+              }
+          });
+      }
 
       // 5. Connect live recalculation on inputs change (on complete update: focus loss / Enter key)
       const form = document.getElementById('configForm');
