@@ -971,6 +971,10 @@
       // 11. Generate Simulation Report
       document.getElementById('btnGenReport').addEventListener('click', generateReport);
 
+      // Initialize FEC Block auto-calculations
+      syncFecBlocks('us');
+      syncFecBlocks('ds');
+
       // Run initial simulation calculation
       runSimulation();
     });
@@ -1502,6 +1506,8 @@
           }
 
           if (loadedCount > 0) {
+            syncFecBlocks('us');
+            syncFecBlocks('ds');
             runSimulation();
             showToast('Configuration loaded successfully!');
           } else {
