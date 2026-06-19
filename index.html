@@ -313,6 +313,7 @@
             <button type="button" class="tab-btn" data-tab="tabBudget">Detailed Budget</button>
             <button type="button" class="tab-btn" data-tab="tabTable">Frequency Grid</button>
             <button type="button" class="tab-btn" data-tab="tabFrameEditor">Frame Editor</button>
+            <button type="button" class="tab-btn" data-tab="tabCableModels">Cable Models</button>
             <button type="button" class="tab-btn" data-tab="tabJson">JSON Config</button>
           </div>
 
@@ -635,6 +636,55 @@
               <pre id="jsonPre">{}</pre>
             </div>
           </div>
+
+          <!-- Tab: Cable Models -->
+          <div class="tab-panel" id="tabCableModels">
+            <div class="parameters-grid">
+              <div class="form-section-title" style="grid-column: span 2; font-size: 1rem;">Add Custom Cable Model</div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label for="customModelName">Model Name (e.g., custom_cable_24awg)</label>
+                <input type="text" id="customModelName" placeholder="Enter unique model name">
+              </div>
+              <div class="form-group">
+                <label for="customModelB0">Constant b0</label>
+                <input type="number" id="customModelB0" value="0" step="any">
+              </div>
+              <div class="form-group">
+                <label for="customModelB1">Constant b1</label>
+                <input type="number" id="customModelB1" value="0" step="any">
+              </div>
+              <div class="form-group">
+                <label for="customModelP">Constant p</label>
+                <input type="number" id="customModelP" value="0.5" step="any">
+              </div>
+              <div class="form-group">
+                <label for="customModelDrho">Constant drho</label>
+                <input type="number" id="customModelDrho" value="0" step="any">
+              </div>
+              <div style="grid-column: span 2; display: flex; justify-content: flex-end; margin-top: 0.5rem;">
+                <button type="button" class="btn" id="btnAddCustomModel">Add to Cable Models</button>
+              </div>
+
+              <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Custom Models Session List</div>
+              <div style="grid-column: span 2;">
+                <table class="budget-table" id="customModelsTable" style="margin-top: 0;">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>b0</th>
+                      <th>b1</th>
+                      <th>p</th>
+                      <th>drho</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -659,12 +709,13 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.5.1';
+    const CALCULATOR_VERSION = 'v0.6.0';
 
     let lastResult = null;
     let chartInstanceSnr = null;
     let chartInstanceLoss = null;
     let chartInstancePsd = null;
+    window.customCableModels = [];
 
     // Helper: Debouncer to prevent layout lag on continuous inputs
     function debounce(func, wait) {
@@ -780,6 +831,68 @@
           }
         });
       });
+
+      // Custom Cable Models logic
+      const btnAddCustomModel = document.getElementById('btnAddCustomModel');
+      const customModelsTableBody = document.querySelector('#customModelsTable tbody');
+      
+      window.refreshCustomModelsUI = function() {
+        if (!customModelsTableBody) return;
+        if (window.customCableModels.length === 0) {
+          customModelsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>';
+        } else {
+          customModelsTableBody.innerHTML = '';
+          window.customCableModels.forEach(cm => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${cm.name}</td><td>${cm.b0}</td><td>${cm.b1}</td><td>${cm.p}</td><td>${cm.drho}</td>`;
+            customModelsTableBody.appendChild(tr);
+          });
+        }
+        
+        // Refresh Dropdowns, preserving current selection
+        const cableVal = cableSelect.value;
+        const pcbVal = pcbSelect.value;
+        
+        cableSelect.innerHTML = '';
+        pcbSelect.innerHTML = '';
+        Object.keys(window.CHANNEL_MODELS).forEach(model => {
+          cableSelect.add(new Option(model, model));
+          pcbSelect.add(new Option(model, model));
+        });
+        
+        if (window.CHANNEL_MODELS[cableVal]) cableSelect.value = cableVal;
+        if (window.CHANNEL_MODELS[pcbVal]) pcbSelect.value = pcbVal;
+      };
+
+      if (btnAddCustomModel) {
+        btnAddCustomModel.addEventListener('click', () => {
+          const name = document.getElementById('customModelName').value.trim();
+          if (!name) { alert("Model Name is required."); return; }
+          if (window.CHANNEL_MODELS[name] && !window.customCableModels.find(m => m.name === name)) {
+            alert("A built-in model with this name already exists.");
+            return;
+          }
+          
+          const b0 = parseFloat(document.getElementById('customModelB0').value);
+          const b1 = parseFloat(document.getElementById('customModelB1').value);
+          const p = parseFloat(document.getElementById('customModelP').value);
+          const drho = parseFloat(document.getElementById('customModelDrho').value);
+          
+          const newModel = { name, b0, b1, p, drho };
+          
+          // Overwrite or push custom model
+          const existingIdx = window.customCableModels.findIndex(m => m.name === name);
+          if (existingIdx >= 0) window.customCableModels[existingIdx] = newModel;
+          else window.customCableModels.push(newModel);
+          
+          // Register into global calculator scope
+          window.CHANNEL_MODELS[name] = { b0, b1, p, drho };
+          
+          refreshCustomModelsUI();
+          runSimulation(); // Recalculate if it was selected
+          alert(`Custom model '${name}' added successfully.`);
+        });
+      }
 
       // Sync FEC block sizes and overheads
       window.syncFecBlocks = function syncFecBlocks(direction) {
@@ -1366,6 +1479,7 @@
       if (!lastResult) return;
       const configData = {
         calculatorVersion: CALCULATOR_VERSION,
+        customCableModels: window.customCableModels,
         ...lastResult.input
       };
       const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });
@@ -1397,6 +1511,16 @@
       reader.onload = function(e) {
         try {
           const config = JSON.parse(e.target.result);
+          
+          if (Array.isArray(config.customCableModels)) {
+            window.customCableModels = config.customCableModels;
+            window.customCableModels.forEach(cm => {
+              window.CHANNEL_MODELS[cm.name] = { b0: cm.b0, b1: cm.b1, p: cm.p, drho: cm.drho };
+            });
+            if (typeof window.refreshCustomModelsUI === 'function') {
+              window.refreshCustomModelsUI();
+            }
+          }
           
           // Backward compatibility fallback: if legacy global values exist, map them to US/DS fields
           if (config.fecBlockSize !== undefined) {

@@ -73,7 +73,7 @@ const DEFAULT_INPUTS = Object.freeze({
 });
 
 // Channels!W:AL parameter table. Formula: IL_per_m = b0*((1+drho*(T-20))*f)^p + b1*f
-const CHANNEL_MODELS = Object.freeze({
+const CHANNEL_MODELS = {
   'eq149-18': { b1: -1.3333333333333334e-10, b0: -9.045189161192256e-5, p: 0.45, drho: 0 },
   'mueller_3cy_01_10_14_20_target': { b1: -8.831339802848656e-11, b0: -2.91866049923803e-5, p: 0.5, drho: 0.004 },
   'boyer_3cy_01_10_14_20_c1': { b1: -1.2353665436395793e-10, b0: -2.2866874998790228e-5, p: 0.5, drho: 0.004 },
@@ -88,7 +88,7 @@ const CHANNEL_MODELS = Object.freeze({
   'Gianordoli_Silvano_de_Sousa_3cy_01_02_09_21_24awg': { b1: -8.381150118176195e-11, b0: -1.900538624362459e-5, p: 0.5, drho: 0.004 },
   'pcb_kadry_3cy_02_0820': { b1: -3.854330708661418e-9, b0: -4.4819683372465216e-5, p: 0.5, drho: 0 },
   none: { b1: 0, b0: 0, p: 0.5, drho: 0 }
-});
+};
 
 const CONNECTOR_ECHO_C0 = Object.freeze({ Bad: 7.5e-11, Hard: 1.7e-11, Good: 1e-12, Easy: 1e-14 });
 
