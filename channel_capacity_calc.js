@@ -28,7 +28,7 @@ const MODULATION_TABLE = Object.freeze({
 });
 
 const DEFAULT_INPUTS = Object.freeze({
-  configTitle: '',
+  configTitle: 'IEEE 802.3ch Reference Performance',
   configDescription: '',
   dataRateGbpsUs: 10,
   dataRateGbpsDs: 10,
@@ -63,7 +63,7 @@ const DEFAULT_INPUTS = Object.freeze({
   connectorEchoCancellationDbDs: 50,
   implementationLossDbUs: 5,
   implementationLossDbDs: 5,
-  cableModel: 'mueller_3cy_01_12_01_20_sdp',
+  cableModel: 'eq149-18',
   pcbModel: 'pcb_kadry_3cy_02_0820',
   pcbTraceLengthM: 0.0762,
   connectorEchoModel: 'Hard',
