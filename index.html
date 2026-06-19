@@ -651,7 +651,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.18';
+    const CALCULATOR_VERSION = 'v0.4.19';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -774,7 +774,7 @@
       });
 
       // Sync FEC block sizes and overheads
-      function syncFecBlocks(direction) {
+      window.syncFecBlocks = function syncFecBlocks(direction) {
         const suffix = direction === 'us' ? 'Us' : 'Ds';
         const kInput = document.getElementById(`fecDataSize${suffix}`);
         const bpsInput = document.getElementById(`fecBitsPerSymbol${suffix}`);
