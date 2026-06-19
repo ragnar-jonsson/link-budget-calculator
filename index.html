@@ -310,13 +310,17 @@
 
           <!-- Tab: Interactive Charts -->
           <div class="tab-panel active" id="tabCharts">
-            <div class="chart-controls">
-              <button type="button" class="chart-toggle-btn active" data-chart="snr">SNR Profile</button>
-              <button type="button" class="chart-toggle-btn" data-chart="loss">Insertion Loss Profiles</button>
-              <button type="button" class="chart-toggle-btn" data-chart="psd">Transmit PSD</button>
+            <div class="chart-wrapper" id="snrChartWrapper" style="margin-bottom: 2rem;">
+              <h3 style="text-align: center; color: #e2e8f0; margin-bottom: 0.5rem; font-size: 1rem;">SNR Profile vs. Frequency</h3>
+              <canvas id="snrCanvas"></canvas>
             </div>
-            <div class="chart-wrapper" id="chartWrapper">
-              <canvas id="chartCanvas"></canvas>
+            <div class="chart-wrapper" id="lossChartWrapper" style="margin-bottom: 2rem;">
+              <h3 style="text-align: center; color: #e2e8f0; margin-bottom: 0.5rem; font-size: 1rem;">Insertion Loss Profiles vs. Frequency</h3>
+              <canvas id="lossCanvas"></canvas>
+            </div>
+            <div class="chart-wrapper" id="psdChartWrapper" style="margin-bottom: 1rem;">
+              <h3 style="text-align: center; color: #e2e8f0; margin-bottom: 0.5rem; font-size: 1rem;">Transmit PSD vs. Frequency</h3>
+              <canvas id="psdCanvas"></canvas>
             </div>
           </div>
 
@@ -645,11 +649,12 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.12';
+    const CALCULATOR_VERSION = 'v0.4.15';
 
     let lastResult = null;
-    let chartInstance = null;
-    let currentChartType = 'snr';
+    let chartInstanceSnr = null;
+    let chartInstanceLoss = null;
+    let chartInstancePsd = null;
 
     // Helper: Debouncer to prevent layout lag on continuous inputs
     function debounce(func, wait) {
@@ -765,20 +770,6 @@
           }
         });
       });
-
-      // 4. Chart toggle setup
-      document.querySelectorAll('.chart-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.chart-toggle-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentChartType = btn.dataset.chart;
-          if (lastResult) {
-            updateCharts(lastResult);
-          }
-        });
-      });
-
-
 
       // Sync FEC block sizes and overheads
       function syncFecBlocks(direction) {
@@ -1052,21 +1043,22 @@
     function updateCharts(result) {
       if (typeof Chart === 'undefined') return;
 
-      const canvas = document.getElementById('chartCanvas');
-      const ctx = canvas.getContext('2d');
+      const snrCtx = document.getElementById('snrCanvas').getContext('2d');
+      const lossCtx = document.getElementById('lossCanvas').getContext('2d');
+      const psdCtx = document.getElementById('psdCanvas').getContext('2d');
 
-      if (chartInstance) {
-        chartInstance.destroy();
-      }
+      if (chartInstanceSnr) chartInstanceSnr.destroy();
+      if (chartInstanceLoss) chartInstanceLoss.destroy();
+      if (chartInstancePsd) chartInstancePsd.destroy();
 
-      if (currentChartType === 'snr') {
+      {
         const snrUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbUs }));
         const snrDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.snrDbDs }));
         const maxVal = Math.max(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
         const minVal = Math.min(...result.rows.map(r => r.snrDbUs), ...result.rows.map(r => r.snrDbDs));
         const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
 
-        chartInstance = new Chart(ctx, {
+        chartInstanceSnr = new Chart(snrCtx, {
           type: 'line',
           data: {
             datasets: [
@@ -1126,7 +1118,9 @@
             }
           }
         });
-      } else if (currentChartType === 'loss') {
+      }
+      
+      {
         const cableLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilCableDb }));
         const pcbLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilPcbDb }));
         const totalLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilDb }));
@@ -1134,7 +1128,7 @@
         const minVal = Math.min(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
         const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
 
-        chartInstance = new Chart(ctx, {
+        chartInstanceLoss = new Chart(lossCtx, {
           type: 'line',
           data: {
             datasets: [
@@ -1198,14 +1192,15 @@
             }
           }
         });
-      } else if (currentChartType === 'psd') {
+      }
+      
+      {
         const txPsdUs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdUs }));
         const txPsdDs = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.txPsdDs }));
         const maxVal = Math.max(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
         const minVal = Math.min(...result.rows.map(r => r.txPsdUs), ...result.rows.map(r => r.txPsdDs));
         const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
-
-        chartInstance = new Chart(ctx, {
+        chartInstancePsd = new Chart(psdCtx, {
           type: 'line',
           data: {
             datasets: [
