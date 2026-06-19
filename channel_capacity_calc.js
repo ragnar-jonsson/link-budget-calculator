@@ -30,8 +30,8 @@ const MODULATION_TABLE = Object.freeze({
 const DEFAULT_INPUTS = Object.freeze({
   configTitle: '',
   configDescription: '',
-  dataRateGbpsUs: 25,
-  dataRateGbpsDs: 25,
+  dataRateGbpsUs: 10,
+  dataRateGbpsDs: 10,
   targetBer: 1e-12,
   cableLengthM: 11,
   wireReflectionLimit: 'jonsson*12_08_20',

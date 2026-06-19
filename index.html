@@ -593,6 +593,14 @@
                 <label for="tddDutyCycleDs" title="Time Division Duplexing (TDD) Downstream duty cycle (0 to 1)">TDD Duty Cycle DS</label>
                 <input type="number" id="tddDutyCycleDs" name="tddDutyCycleDs" min="0.01" max="1" step="0.01">
               </div>
+              <div class="form-group">
+                <label for="computedSymbolRateGbaudUs" title="Computed Symbol Rate US (Read-only)">Symbol Rate US (GBaud)</label>
+                <input type="number" id="computedSymbolRateGbaudUs" disabled>
+              </div>
+              <div class="form-group">
+                <label for="computedSymbolRateGbaudDs" title="Computed Symbol Rate DS (Read-only)">Symbol Rate DS (GBaud)</label>
+                <input type="number" id="computedSymbolRateGbaudDs" disabled>
+              </div>
             </div>
           </div>
 
@@ -973,6 +981,15 @@
       document.getElementById('tdNyqUs').textContent = `${(result.nyquistHzUs / 1e9).toFixed(3)} GHz`;
       document.getElementById('tdNyqDs').textContent = `${(result.nyquistHzDs / 1e9).toFixed(3)} GHz`;
       
+      document.getElementById('baudRateUs').textContent = (result.sampleRateHzUs / 1e9).toFixed(5);
+      document.getElementById('baudRateDs').textContent = (result.sampleRateHzDs / 1e9).toFixed(5);
+      
+      const computedGbaudUs = document.getElementById('computedSymbolRateGbaudUs');
+      if (computedGbaudUs) computedGbaudUs.value = (result.sampleRateHzUs / 1e9).toFixed(6);
+      
+      const computedGbaudDs = document.getElementById('computedSymbolRateGbaudDs');
+      if (computedGbaudDs) computedGbaudDs.value = (result.sampleRateHzDs / 1e9).toFixed(6);
+
       document.getElementById('tdBaudUs').textContent = `${(result.sampleRateHzUs / 1e9).toFixed(3)} GBaud`;
       document.getElementById('tdBaudDs').textContent = `${(result.sampleRateHzDs / 1e9).toFixed(3)} GBaud`;
 
