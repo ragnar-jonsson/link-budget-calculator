@@ -611,8 +611,8 @@
           <!-- Tab: Exportable JSON config & results -->
           <div class="tab-panel" id="tabJson">
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-              <button type="button" class="btn" id="btnCopyJson">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <button type="button" class="action-btn-sm" id="btnCopyJson" style="height: 28px; padding: 0 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 14px; height: 14px;">
                   <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                 </svg>
                 Copy to Clipboard
@@ -649,7 +649,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.4.15';
+    const CALCULATOR_VERSION = 'v0.4.16';
 
     let lastResult = null;
     let chartInstanceSnr = null;
