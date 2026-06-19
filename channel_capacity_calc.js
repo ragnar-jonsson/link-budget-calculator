@@ -259,8 +259,7 @@ function computeSampleRateAndNyquist(direction, input) {
   const netDataBitsPerFrame = numBlocks * 64;
   const lineDataBitsPerFrame = n * bitsPerSym;
   
-  const overhead = direction === 'us' ? input.framingOverheadUs : input.framingOverheadDs;
-  const sampleRateHz = (dataRateGbps * 1e9 / netDataBitsPerFrame) * lineDataBitsPerFrame / bitsPerSymbol / duty * (1 + overhead);
+  const sampleRateHz = (dataRateGbps * 1e9 / netDataBitsPerFrame) * lineDataBitsPerFrame / bitsPerSymbol / duty;
   return { sampleRateHz, nyquistHz: sampleRateHz / 2 };
 }
 
