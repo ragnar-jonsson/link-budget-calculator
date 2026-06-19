@@ -138,6 +138,17 @@ function logGamma(z) {
   return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
 }
 
+function logCombinations(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  if (k === 0 || k === n) return 0;
+  k = Math.min(k, n - k);
+  let sum = 0;
+  for (let i = 1; i <= k; i++) {
+    sum += Math.log(n - i + 1) - Math.log(i);
+  }
+  return sum;
+}
+
 function gammaP(a, x) {
   // Regularized lower incomplete gamma P(a,x), as used by chi-square CDF.
   if (x <= 0) return 0;
@@ -227,6 +238,19 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
   }
   const numOverheadBits = totalDataBits - (numBlocks64b65b * 65);
 
+  const t = Math.floor((n - k) / 2);
+  const q = Math.pow(2, bitsPerSym);
+  const qMinusK = Math.pow(q, -k);
+  const factor = 1 - (isFinite(qMinusK) ? qMinusK : 0);
+  let sum = 0;
+  const lnQ = Math.log(q);
+  const lnQ1 = Math.log(q - 1);
+  for (let i = 0; i <= t; i++) {
+      const lnTerm = logCombinations(n, i) + i * lnQ1 - 2 * t * lnQ;
+      sum += Math.exp(lnTerm);
+  }
+  const decoderErrorProb = factor * sum;
+
   return {
     correctionSymbols,
     avgErrorsPerBlock,
@@ -237,7 +261,8 @@ function computeFecAndRequiredSnr(direction, input, sampleRateSymbolMultiplier) 
     requiredSnrDb: linearToDb(requiredSnrLinear),
     totalDataBits,
     numBlocks64b65b,
-    numOverheadBits
+    numOverheadBits,
+    decoderErrorProb
   };
 }
 
