@@ -981,9 +981,6 @@
       document.getElementById('tdNyqUs').textContent = `${(result.nyquistHzUs / 1e9).toFixed(3)} GHz`;
       document.getElementById('tdNyqDs').textContent = `${(result.nyquistHzDs / 1e9).toFixed(3)} GHz`;
       
-      document.getElementById('baudRateUs').textContent = (result.sampleRateHzUs / 1e9).toFixed(5);
-      document.getElementById('baudRateDs').textContent = (result.sampleRateHzDs / 1e9).toFixed(5);
-      
       const computedGbaudUs = document.getElementById('computedSymbolRateGbaudUs');
       if (computedGbaudUs) computedGbaudUs.value = (result.sampleRateHzUs / 1e9).toFixed(6);
       
