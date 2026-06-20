@@ -33,7 +33,7 @@ const DEFAULT_INPUTS = Object.freeze({
   dataRateGbpsUs: 10,
   dataRateGbpsDs: 10,
   targetBer: 1e-12,
-  cableLengthM: 11,
+  cableLengthM: 15,
   wireReflectionLimit: 'jonsson*12_08_20',
   numberOfConnectors: 4,
   modulationUs: 'PAM4',
