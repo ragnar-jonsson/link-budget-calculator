@@ -571,6 +571,14 @@
                 <label for="decoderErrorProbUs" title="Decoder Error Probability US (Read-only)">Decoder Err Prob US</label>
                 <input type="text" id="decoderErrorProbUs" disabled>
               </div>
+              <div class="form-group">
+                <label for="correctionSymbolsUs" title="Number of correctable symbols (t) US (Read-only)">Correctable Syms (t) US</label>
+                <input type="text" id="correctionSymbolsUs" disabled>
+              </div>
+              <div class="form-group">
+                <label for="maxBurstDurationUs" title="Maximum correctable error burst duration US (Read-only)">Max Burst Dur US (ns)</label>
+                <input type="text" id="maxBurstDurationUs" disabled>
+              </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Downstream FEC (DS)</div>
               <div class="form-group">
@@ -597,6 +605,14 @@
               <div class="form-group">
                 <label for="decoderErrorProbDs" title="Decoder Error Probability DS (Read-only)">Decoder Err Prob DS</label>
                 <input type="text" id="decoderErrorProbDs" disabled>
+              </div>
+              <div class="form-group">
+                <label for="correctionSymbolsDs" title="Number of correctable symbols (t) DS (Read-only)">Correctable Syms (t) DS</label>
+                <input type="text" id="correctionSymbolsDs" disabled>
+              </div>
+              <div class="form-group">
+                <label for="maxBurstDurationDs" title="Maximum correctable error burst duration DS (Read-only)">Max Burst Dur DS (ns)</label>
+                <input type="text" id="maxBurstDurationDs" disabled>
               </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Framing & Duplexing</div>
@@ -714,7 +730,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.6';
+    const CALCULATOR_VERSION = 'v0.6.7';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -1110,8 +1126,30 @@
       const decoderErrUs = document.getElementById('decoderErrorProbUs');
       if (decoderErrUs && result.fecUs.decoderErrorProb !== undefined) decoderErrUs.value = result.fecUs.decoderErrorProb.toExponential(3);
 
+      const correctionSymsUs = document.getElementById('correctionSymbolsUs');
+      if (correctionSymsUs) correctionSymsUs.value = result.fecUs.correctionSymbols;
+      
+      const maxBurstDurUs = document.getElementById('maxBurstDurationUs');
+      if (maxBurstDurUs) {
+        const bitsPerSymUs = result.input.fecBitsPerSymbolUs ?? result.input.fecBitsPerSymbol ?? 10;
+        const bitsPerSymbolUs = result.modulationUs.bitsPerSymbol;
+        const durationUs = (result.fecUs.correctionSymbols * bitsPerSymUs / bitsPerSymbolUs) / result.sampleRateHzUs * 1e9;
+        maxBurstDurUs.value = durationUs.toFixed(2);
+      }
+
       const decoderErrDs = document.getElementById('decoderErrorProbDs');
       if (decoderErrDs && result.fecDs.decoderErrorProb !== undefined) decoderErrDs.value = result.fecDs.decoderErrorProb.toExponential(3);
+
+      const correctionSymsDs = document.getElementById('correctionSymbolsDs');
+      if (correctionSymsDs) correctionSymsDs.value = result.fecDs.correctionSymbols;
+      
+      const maxBurstDurDs = document.getElementById('maxBurstDurationDs');
+      if (maxBurstDurDs) {
+        const bitsPerSymDs = result.input.fecBitsPerSymbolDs ?? result.input.fecBitsPerSymbol ?? 10;
+        const bitsPerSymbolDs = result.modulationDs.bitsPerSymbol;
+        const durationDs = (result.fecDs.correctionSymbols * bitsPerSymDs / bitsPerSymbolDs) / result.sampleRateHzDs * 1e9;
+        maxBurstDurDs.value = durationDs.toFixed(2);
+      }
 
       document.getElementById('tdBaudUs').textContent = `${(result.sampleRateHzUs / 1e9).toFixed(3)} GBaud`;
       document.getElementById('tdBaudDs').textContent = `${(result.sampleRateHzDs / 1e9).toFixed(3)} GBaud`;
