@@ -74,6 +74,8 @@ const DEFAULT_INPUTS = Object.freeze({
 
 // Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
 const CHANNEL_MODELS = {
+  'CX31a_20C': { a: 0.06, c: 7.4e-11, b: 1.4e-5, p: 0.5, drho: 0.004 },
+  'CX174e_20C': { a: 0.11, c: 2e-10, b: 2e-5, p: 0.5, drho: 0.004 },
   'eq149-18': { a: 0, c: 1.3333333333333334e-10, b: 9.045189161192256e-5, p: 0.45, drho: 0 },
   'mueller_3cy_01_10_14_20_target': { a: 0, c: 8.831339802848656e-11, b: 2.91866049923803e-5, p: 0.5, drho: 0.004 },
   'boyer_3cy_01_10_14_20_c1': { a: 0, c: 1.2353665436395793e-10, b: 2.2866874998790228e-5, p: 0.5, drho: 0.004 },
