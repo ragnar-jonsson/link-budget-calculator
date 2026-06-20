@@ -646,12 +646,16 @@
                 <input type="text" id="customModelName" placeholder="Enter unique model name">
               </div>
               <div class="form-group">
-                <label for="customModelB0">Constant b0</label>
-                <input type="number" id="customModelB0" value="0" step="any">
+                <label for="customModelA">Constant a</label>
+                <input type="number" id="customModelA" value="0" step="any">
               </div>
               <div class="form-group">
-                <label for="customModelB1">Constant b1</label>
-                <input type="number" id="customModelB1" value="0" step="any">
+                <label for="customModelB">Constant b</label>
+                <input type="number" id="customModelB" value="0" step="any">
+              </div>
+              <div class="form-group">
+                <label for="customModelC">Constant c</label>
+                <input type="number" id="customModelC" value="0" step="any">
               </div>
               <div class="form-group">
                 <label for="customModelP">Constant p</label>
@@ -671,14 +675,15 @@
                   <thead>
                     <tr>
                       <th>Name</th>
-                      <th>b0</th>
-                      <th>b1</th>
+                      <th>a</th>
+                      <th>b</th>
+                      <th>c</th>
                       <th>p</th>
                       <th>drho</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>
+                    <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -709,7 +714,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.0';
+    const CALCULATOR_VERSION = 'v0.6.1';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -839,12 +844,12 @@
       window.refreshCustomModelsUI = function() {
         if (!customModelsTableBody) return;
         if (window.customCableModels.length === 0) {
-          customModelsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>';
+          customModelsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No custom models added yet.</td></tr>';
         } else {
           customModelsTableBody.innerHTML = '';
           window.customCableModels.forEach(cm => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td>${cm.name}</td><td>${cm.b0}</td><td>${cm.b1}</td><td>${cm.p}</td><td>${cm.drho}</td>`;
+            tr.innerHTML = `<td>${cm.name}</td><td>${cm.a ?? 0}</td><td>${cm.b ?? cm.b0}</td><td>${cm.c ?? cm.b1}</td><td>${cm.p}</td><td>${cm.drho}</td>`;
             customModelsTableBody.appendChild(tr);
           });
         }
@@ -873,12 +878,13 @@
             return;
           }
           
-          const b0 = parseFloat(document.getElementById('customModelB0').value);
-          const b1 = parseFloat(document.getElementById('customModelB1').value);
+          const a = parseFloat(document.getElementById('customModelA').value);
+          const b = parseFloat(document.getElementById('customModelB').value);
+          const c = parseFloat(document.getElementById('customModelC').value);
           const p = parseFloat(document.getElementById('customModelP').value);
           const drho = parseFloat(document.getElementById('customModelDrho').value);
           
-          const newModel = { name, b0, b1, p, drho };
+          const newModel = { name, a, b, c, p, drho };
           
           // Overwrite or push custom model
           const existingIdx = window.customCableModels.findIndex(m => m.name === name);
@@ -886,7 +892,7 @@
           else window.customCableModels.push(newModel);
           
           // Register into global calculator scope
-          window.CHANNEL_MODELS[name] = { b0, b1, p, drho };
+          window.CHANNEL_MODELS[name] = { a, b, c, p, drho };
           
           refreshCustomModelsUI();
           runSimulation(); // Recalculate if it was selected
@@ -1515,7 +1521,7 @@
           if (Array.isArray(config.customCableModels)) {
             window.customCableModels = config.customCableModels;
             window.customCableModels.forEach(cm => {
-              window.CHANNEL_MODELS[cm.name] = { b0: cm.b0, b1: cm.b1, p: cm.p, drho: cm.drho };
+              window.CHANNEL_MODELS[cm.name] = { a: cm.a ?? 0, b: cm.b ?? cm.b0, c: cm.c ?? cm.b1, p: cm.p, drho: cm.drho };
             });
             if (typeof window.refreshCustomModelsUI === 'function') {
               window.refreshCustomModelsUI();

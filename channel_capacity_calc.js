@@ -72,22 +72,22 @@ const DEFAULT_INPUTS = Object.freeze({
   nSteps: 200
 });
 
-// Channels!W:AL parameter table. Formula: IL_per_m = b0*((1+drho*(T-20))*f)^p + b1*f
+// Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
 const CHANNEL_MODELS = {
-  'eq149-18': { b1: -1.3333333333333334e-10, b0: -9.045189161192256e-5, p: 0.45, drho: 0 },
-  'mueller_3cy_01_10_14_20_target': { b1: -8.831339802848656e-11, b0: -2.91866049923803e-5, p: 0.5, drho: 0.004 },
-  'boyer_3cy_01_10_14_20_c1': { b1: -1.2353665436395793e-10, b0: -2.2866874998790228e-5, p: 0.5, drho: 0.004 },
-  'patel_3cy_01_0920': { b1: -2.0677835206542268e-10, b0: -2.2166641006363804e-5, p: 0.5, drho: 0.004 },
-  'zimmerman_3cy_01a_1120': { b1: -7.272727272727272e-11, b0: -8.166636466797575e-5, p: 0.45, drho: 0 },
-  'mueller_3cy_01_12_01_20_sdp': { b1: -9.218595807956661e-11, b0: -2.11820422200573e-5, p: 0.5, drho: 0.004 },
-  'mueller_3cy_01_12_01_20_stp': { b1: -3.291003355690276e-10, b0: -1.7601039374847014e-5, p: 0.5, drho: 0.004 },
-  'koeppendoerfer_3cy_01_10_28_20_sdp3': { b1: -9.934097406279351e-11, b0: -2.622701573690151e-5, p: 0.5, drho: 0.004 },
-  'neulinger_3cy_01_12_15_20': { b1: -7.778552179559718e-11, b0: -2.3934384125859205e-5, p: 0.5, drho: 0.004 },
-  'diminico_3cy_01a_1_5_21_26awg': { b1: -5.57124339148326e-11, b0: -2.1531762390265137e-5, p: 0.5, drho: 0.004 },
-  'diminico_3cy_01a_1_5_21_28awg': { b1: -4.2070178303516764e-11, b0: -2.7283241168989157e-5, p: 0.5, drho: 0.004 },
-  'Gianordoli_Silvano_de_Sousa_3cy_01_02_09_21_24awg': { b1: -8.381150118176195e-11, b0: -1.900538624362459e-5, p: 0.5, drho: 0.004 },
-  'pcb_kadry_3cy_02_0820': { b1: -3.854330708661418e-9, b0: -4.4819683372465216e-5, p: 0.5, drho: 0 },
-  none: { b1: 0, b0: 0, p: 0.5, drho: 0 }
+  'eq149-18': { a: 0, c: -1.3333333333333334e-10, b: -9.045189161192256e-5, p: 0.45, drho: 0 },
+  'mueller_3cy_01_10_14_20_target': { a: 0, c: -8.831339802848656e-11, b: -2.91866049923803e-5, p: 0.5, drho: 0.004 },
+  'boyer_3cy_01_10_14_20_c1': { a: 0, c: -1.2353665436395793e-10, b: -2.2866874998790228e-5, p: 0.5, drho: 0.004 },
+  'patel_3cy_01_0920': { a: 0, c: -2.0677835206542268e-10, b: -2.2166641006363804e-5, p: 0.5, drho: 0.004 },
+  'zimmerman_3cy_01a_1120': { a: 0, c: -7.272727272727272e-11, b: -8.166636466797575e-5, p: 0.45, drho: 0 },
+  'mueller_3cy_01_12_01_20_sdp': { a: 0, c: -9.218595807956661e-11, b: -2.11820422200573e-5, p: 0.5, drho: 0.004 },
+  'mueller_3cy_01_12_01_20_stp': { a: 0, c: -3.291003355690276e-10, b: -1.7601039374847014e-5, p: 0.5, drho: 0.004 },
+  'koeppendoerfer_3cy_01_10_28_20_sdp3': { a: 0, c: -9.934097406279351e-11, b: -2.622701573690151e-5, p: 0.5, drho: 0.004 },
+  'neulinger_3cy_01_12_15_20': { a: 0, c: -7.778552179559718e-11, b: -2.3934384125859205e-5, p: 0.5, drho: 0.004 },
+  'diminico_3cy_01a_1_5_21_26awg': { a: 0, c: -5.57124339148326e-11, b: -2.1531762390265137e-5, p: 0.5, drho: 0.004 },
+  'diminico_3cy_01a_1_5_21_28awg': { a: 0, c: -4.2070178303516764e-11, b: -2.7283241168989157e-5, p: 0.5, drho: 0.004 },
+  'Gianordoli_Silvano_de_Sousa_3cy_01_02_09_21_24awg': { a: 0, c: -8.381150118176195e-11, b: -1.900538624362459e-5, p: 0.5, drho: 0.004 },
+  'pcb_kadry_3cy_02_0820': { a: 0, c: -3.854330708661418e-9, b: -4.4819683372465216e-5, p: 0.5, drho: 0 },
+  none: { a: 0, c: 0, b: 0, p: 0.5, drho: 0 }
 };
 
 const CONNECTOR_ECHO_C0 = Object.freeze({ Bad: 7.5e-11, Hard: 1.7e-11, Good: 1e-12, Easy: 1e-14 });
@@ -198,7 +198,7 @@ function chiSqInv(p, df) {
 function channelInsertionLossPerMeterDb(fHz, modelName, temperatureC) {
   const m = CHANNEL_MODELS[modelName];
   if (!m) throw new Error(`Unknown channel model: ${modelName}`);
-  return m.b0 * Math.pow((1 + m.drho * (temperatureC - 20)) * fHz, m.p) + m.b1 * fHz;
+  return (m.a || 0) + (m.b ?? m.b0) * Math.pow((1 + (m.drho || 0) * (temperatureC - 20)) * fHz, m.p) + (m.c ?? m.b1) * fHz;
 }
 
 function getModulation(direction, input) {
