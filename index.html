@@ -579,6 +579,10 @@
                 <label for="maxBurstDurationUs" title="Maximum correctable error burst duration US (Read-only)">Max Burst Dur US (ns)</label>
                 <input type="text" id="maxBurstDurationUs" disabled>
               </div>
+              <div class="form-group">
+                <label for="fecInterleavingUs" title="FEC Interleaving Depth (L) for Upstream">Interleaving US (L)</label>
+                <input type="number" id="fecInterleavingUs" name="fecInterleavingUs" min="1" step="1">
+              </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Downstream FEC (DS)</div>
               <div class="form-group">
@@ -613,6 +617,10 @@
               <div class="form-group">
                 <label for="maxBurstDurationDs" title="Maximum correctable error burst duration DS (Read-only)">Max Burst Dur DS (ns)</label>
                 <input type="text" id="maxBurstDurationDs" disabled>
+              </div>
+              <div class="form-group">
+                <label for="fecInterleavingDs" title="FEC Interleaving Depth (L) for Downstream">Interleaving DS (L)</label>
+                <input type="number" id="fecInterleavingDs" name="fecInterleavingDs" min="1" step="1">
               </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Framing & Duplexing</div>
@@ -730,7 +738,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.7';
+    const CALCULATOR_VERSION = 'v0.6.8';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -1133,7 +1141,8 @@
       if (maxBurstDurUs) {
         const bitsPerSymUs = result.input.fecBitsPerSymbolUs ?? result.input.fecBitsPerSymbol ?? 10;
         const bitsPerSymbolUs = result.modulationUs.bitsPerSymbol;
-        const durationUs = (result.fecUs.correctionSymbols * bitsPerSymUs / bitsPerSymbolUs) / result.sampleRateHzUs * 1e9;
+        const lUs = result.input.fecInterleavingUs ?? 1;
+        const durationUs = (result.fecUs.correctionSymbols * bitsPerSymUs / bitsPerSymbolUs) / result.sampleRateHzUs * 1e9 * lUs;
         maxBurstDurUs.value = durationUs.toFixed(2);
       }
 
@@ -1147,7 +1156,8 @@
       if (maxBurstDurDs) {
         const bitsPerSymDs = result.input.fecBitsPerSymbolDs ?? result.input.fecBitsPerSymbol ?? 10;
         const bitsPerSymbolDs = result.modulationDs.bitsPerSymbol;
-        const durationDs = (result.fecDs.correctionSymbols * bitsPerSymDs / bitsPerSymbolDs) / result.sampleRateHzDs * 1e9;
+        const lDs = result.input.fecInterleavingDs ?? 1;
+        const durationDs = (result.fecDs.correctionSymbols * bitsPerSymDs / bitsPerSymbolDs) / result.sampleRateHzDs * 1e9 * lDs;
         maxBurstDurDs.value = durationDs.toFixed(2);
       }
 

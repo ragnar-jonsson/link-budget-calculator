@@ -46,6 +46,8 @@ const DEFAULT_INPUTS = Object.freeze({
   fecCorrectionEfficiencyDs: 1,
   fecBitsPerSymbolUs: 10,
   fecBitsPerSymbolDs: 10,
+  fecInterleavingUs: 1,
+  fecInterleavingDs: 1,
   tddDutyCycleUs: 1,
   tddDutyCycleDs: 1,
   framingOverheadUs: 0.01875,
