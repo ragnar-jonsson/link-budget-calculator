@@ -568,8 +568,8 @@
                 <input type="number" id="fecOverheadBitsUs" name="fecOverheadBitsUs" min="0" max="64" step="1" disabled>
               </div>
               <div class="form-group">
-                <label for="decoderErrorProbUs" title="Decoder Error Probability US (Read-only)">Decoder Err Prob US</label>
-                <input type="text" id="decoderErrorProbUs" disabled>
+                <label for="fecInterleavingUs" title="FEC Interleaving Depth (L) for Upstream">Interleaving US (L)</label>
+                <input type="number" id="fecInterleavingUs" name="fecInterleavingUs" min="1" step="1">
               </div>
               <div class="form-group">
                 <label for="correctionSymbolsUs" title="Number of correctable symbols (t) US (Read-only)">Correctable Syms (t) US</label>
@@ -580,8 +580,8 @@
                 <input type="text" id="maxBurstDurationUs" disabled>
               </div>
               <div class="form-group">
-                <label for="fecInterleavingUs" title="FEC Interleaving Depth (L) for Upstream">Interleaving US (L)</label>
-                <input type="number" id="fecInterleavingUs" name="fecInterleavingUs" min="1" step="1">
+                <label for="decoderErrorProbUs" title="Decoder Error Probability US (Read-only)">Decoder Err Prob US</label>
+                <input type="text" id="decoderErrorProbUs" disabled>
               </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Downstream FEC (DS)</div>
@@ -607,8 +607,8 @@
                 <input type="number" id="fecOverheadBitsDs" name="fecOverheadBitsDs" min="0" max="64" step="1" disabled>
               </div>
               <div class="form-group">
-                <label for="decoderErrorProbDs" title="Decoder Error Probability DS (Read-only)">Decoder Err Prob DS</label>
-                <input type="text" id="decoderErrorProbDs" disabled>
+                <label for="fecInterleavingDs" title="FEC Interleaving Depth (L) for Downstream">Interleaving DS (L)</label>
+                <input type="number" id="fecInterleavingDs" name="fecInterleavingDs" min="1" step="1">
               </div>
               <div class="form-group">
                 <label for="correctionSymbolsDs" title="Number of correctable symbols (t) DS (Read-only)">Correctable Syms (t) DS</label>
@@ -619,8 +619,8 @@
                 <input type="text" id="maxBurstDurationDs" disabled>
               </div>
               <div class="form-group">
-                <label for="fecInterleavingDs" title="FEC Interleaving Depth (L) for Downstream">Interleaving DS (L)</label>
-                <input type="number" id="fecInterleavingDs" name="fecInterleavingDs" min="1" step="1">
+                <label for="decoderErrorProbDs" title="Decoder Error Probability DS (Read-only)">Decoder Err Prob DS</label>
+                <input type="text" id="decoderErrorProbDs" disabled>
               </div>
 
               <div class="form-section-title" style="grid-column: span 2; margin-top: 1rem; font-size: 1rem;">Framing & Duplexing</div>
@@ -738,7 +738,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.8';
+    const CALCULATOR_VERSION = 'v0.6.9';
 
     let lastResult = null;
     let chartInstanceSnr = null;
