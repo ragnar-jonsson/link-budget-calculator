@@ -74,19 +74,19 @@ const DEFAULT_INPUTS = Object.freeze({
 
 // Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
 const CHANNEL_MODELS = {
-  'eq149-18': { a: 0, c: -1.3333333333333334e-10, b: -9.045189161192256e-5, p: 0.45, drho: 0 },
-  'mueller_3cy_01_10_14_20_target': { a: 0, c: -8.831339802848656e-11, b: -2.91866049923803e-5, p: 0.5, drho: 0.004 },
-  'boyer_3cy_01_10_14_20_c1': { a: 0, c: -1.2353665436395793e-10, b: -2.2866874998790228e-5, p: 0.5, drho: 0.004 },
-  'patel_3cy_01_0920': { a: 0, c: -2.0677835206542268e-10, b: -2.2166641006363804e-5, p: 0.5, drho: 0.004 },
-  'zimmerman_3cy_01a_1120': { a: 0, c: -7.272727272727272e-11, b: -8.166636466797575e-5, p: 0.45, drho: 0 },
-  'mueller_3cy_01_12_01_20_sdp': { a: 0, c: -9.218595807956661e-11, b: -2.11820422200573e-5, p: 0.5, drho: 0.004 },
-  'mueller_3cy_01_12_01_20_stp': { a: 0, c: -3.291003355690276e-10, b: -1.7601039374847014e-5, p: 0.5, drho: 0.004 },
-  'koeppendoerfer_3cy_01_10_28_20_sdp3': { a: 0, c: -9.934097406279351e-11, b: -2.622701573690151e-5, p: 0.5, drho: 0.004 },
-  'neulinger_3cy_01_12_15_20': { a: 0, c: -7.778552179559718e-11, b: -2.3934384125859205e-5, p: 0.5, drho: 0.004 },
-  'diminico_3cy_01a_1_5_21_26awg': { a: 0, c: -5.57124339148326e-11, b: -2.1531762390265137e-5, p: 0.5, drho: 0.004 },
-  'diminico_3cy_01a_1_5_21_28awg': { a: 0, c: -4.2070178303516764e-11, b: -2.7283241168989157e-5, p: 0.5, drho: 0.004 },
-  'Gianordoli_Silvano_de_Sousa_3cy_01_02_09_21_24awg': { a: 0, c: -8.381150118176195e-11, b: -1.900538624362459e-5, p: 0.5, drho: 0.004 },
-  'pcb_kadry_3cy_02_0820': { a: 0, c: -3.854330708661418e-9, b: -4.4819683372465216e-5, p: 0.5, drho: 0 },
+  'eq149-18': { a: 0, c: 1.3333333333333334e-10, b: 9.045189161192256e-5, p: 0.45, drho: 0 },
+  'mueller_3cy_01_10_14_20_target': { a: 0, c: 8.831339802848656e-11, b: 2.91866049923803e-5, p: 0.5, drho: 0.004 },
+  'boyer_3cy_01_10_14_20_c1': { a: 0, c: 1.2353665436395793e-10, b: 2.2866874998790228e-5, p: 0.5, drho: 0.004 },
+  'patel_3cy_01_0920': { a: 0, c: 2.0677835206542268e-10, b: 2.2166641006363804e-5, p: 0.5, drho: 0.004 },
+  'zimmerman_3cy_01a_1120': { a: 0, c: 7.272727272727272e-11, b: 8.166636466797575e-5, p: 0.45, drho: 0 },
+  'mueller_3cy_01_12_01_20_sdp': { a: 0, c: 9.218595807956661e-11, b: 2.11820422200573e-5, p: 0.5, drho: 0.004 },
+  'mueller_3cy_01_12_01_20_stp': { a: 0, c: 3.291003355690276e-10, b: 1.7601039374847014e-5, p: 0.5, drho: 0.004 },
+  'koeppendoerfer_3cy_01_10_28_20_sdp3': { a: 0, c: 9.934097406279351e-11, b: 2.622701573690151e-5, p: 0.5, drho: 0.004 },
+  'neulinger_3cy_01_12_15_20': { a: 0, c: 7.778552179559718e-11, b: 2.3934384125859205e-5, p: 0.5, drho: 0.004 },
+  'diminico_3cy_01a_1_5_21_26awg': { a: 0, c: 5.57124339148326e-11, b: 2.1531762390265137e-5, p: 0.5, drho: 0.004 },
+  'diminico_3cy_01a_1_5_21_28awg': { a: 0, c: 4.2070178303516764e-11, b: 2.7283241168989157e-5, p: 0.5, drho: 0.004 },
+  'Gianordoli_Silvano_de_Sousa_3cy_01_02_09_21_24awg': { a: 0, c: 8.381150118176195e-11, b: 1.900538624362459e-5, p: 0.5, drho: 0.004 },
+  'pcb_kadry_3cy_02_0820': { a: 0, c: 3.854330708661418e-9, b: 4.4819683372465216e-5, p: 0.5, drho: 0 },
   none: { a: 0, c: 0, b: 0, p: 0.5, drho: 0 }
 };
 
@@ -328,7 +328,7 @@ function excelApproxVlookupFrequency(targetHz, fStepHz) {
 function cableLossAtNyquistPositiveDb(input, nyquistHz, fStepHz) {
   const fLookupHz = excelApproxVlookupFrequency(nyquistHz, fStepHz);
   const ilCableDb = channelInsertionLossPerMeterDb(fLookupHz, input.cableModel, input.temperatureC) * input.cableLengthM;
-  return -ilCableDb;
+  return ilCableDb;
 }
 
 function selectedWireEchoDb(input, cableLossNyquistPositiveDb) {
@@ -366,8 +366,8 @@ function compute(inputOverrides = {}) {
     const ilDb = ilCableDb + ilPcbDb;
     const txPsdUs = psdMaskDbmPerHz(input.psdMaskUs, 'us', fHz, input, usRate.nyquistHz);
     const txPsdDs = psdMaskDbmPerHz(input.psdMaskDs, 'ds', fHz, input, dsRate.nyquistHz);
-    const rxPsdUs = txPsdUs + ilDb;
-    const rxPsdDs = txPsdDs + ilDb;
+    const rxPsdUs = txPsdUs - ilDb;
+    const rxPsdDs = txPsdDs - ilDb;
     const connectorEchoDb = input.numberOfConnectors > 0
       ? linearToDb(connectorC0 * fHz + input.numberOfConnectors * 0.00073)
       : -1000;
@@ -427,7 +427,7 @@ function compute(inputOverrides = {}) {
     snrMarginDbDs: estimatedSlicerSnrDbDs - fecDs.requiredSnrDb,
     wireEchoDb,
     cableLossNyquistDbUs: cableLossNyqUsDb,
-    channelInsertionLossNyquistDbUs: -(
+    channelInsertionLossNyquistDbUs: (
       channelInsertionLossPerMeterDb(excelApproxVlookupFrequency(usRate.nyquistHz, fStepHz), input.cableModel, input.temperatureC) * input.cableLengthM +
       channelInsertionLossPerMeterDb(excelApproxVlookupFrequency(usRate.nyquistHz, fStepHz), input.pcbModel, input.temperatureC) * input.pcbTraceLengthM
     ),
