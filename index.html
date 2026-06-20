@@ -714,7 +714,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.2';
+    const CALCULATOR_VERSION = 'v0.6.3';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -1261,7 +1261,7 @@
         const totalLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilDb }));
         const maxVal = Math.max(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
         const minVal = Math.min(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
-        const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+        const yMax = (maxVal - minVal > 150) ? (minVal + 150) : undefined;
 
         chartInstanceLoss = new Chart(lossCtx, {
           type: 'line',
@@ -1319,7 +1319,8 @@
                 ticks: { color: '#94a3b8' }
               },
               y: {
-                min: yMin,
+                reverse: true,
+                max: yMax,
                 title: { display: true, text: 'Loss (dB)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
                 grid: { color: 'rgba(51, 65, 85, 0.3)' },
                 ticks: { color: '#94a3b8' }
@@ -1935,7 +1936,7 @@
           const totalLoss = result.rows.map(r => ({ x: r.fHz / 1e9, y: r.ilDb }));
           const maxVal = Math.max(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
           const minVal = Math.min(...result.rows.map(r => r.ilCableDb), ...result.rows.map(r => r.ilPcbDb), ...result.rows.map(r => r.ilDb));
-          const yMin = (maxVal - minVal > 150) ? (maxVal - 150) : undefined;
+          const yMax = (maxVal - minVal > 150) ? (minVal + 150) : undefined;
 
           config = {
             type: 'line',
@@ -1955,7 +1956,7 @@
               },
               scales: {
                 x: { type: 'linear', title: { display: true, text: 'Frequency (GHz)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } },
-                y: { min: yMin, title: { display: true, text: 'Loss (dB)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } }
+                y: { reverse: true, max: yMax, title: { display: true, text: 'Loss (dB)', color: '#334155', font: { weight: 'bold' } }, grid: { color: '#e2e8f0' }, ticks: { color: '#334155' } }
               }
             }
           };
