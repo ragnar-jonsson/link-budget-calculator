@@ -229,7 +229,7 @@
       </div>
     </div>
     <div style="display: flex; align-items: center; gap: 0.5rem;">
-      <div class="badge-version">v0.6.11 (IEEE 802.3ch / 3cy / 3dm)</div>
+      <div class="badge-version">v0.6.12 (IEEE 802.3ch / 3cy / 3dm)</div>
       <a href="index.html" class="action-btn-sm" style="text-decoration: none; display: flex; align-items: center; gap: 0.25rem;">
         <!-- Return back icon -->
         <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -253,6 +253,7 @@
         <li><a href="#sectionOutputs">4. Dashboard Indicators</a></li>
         <li><a href="#sectionCharts">5. Waveform Charts</a></li>
         <li><a href="#sectionFeatures">6. Advanced Functions</a></li>
+        <li><a href="#sectionAppendixA">Appendix A: Required Slicer SNR</a></li>
       </ul>
       <div class="info-callout" style="margin: 0; padding: 0.875rem; font-size: 0.75rem;">
         <h4>Need Quick Help?</h4>
@@ -267,7 +268,7 @@
       <section class="manual-section" id="sectionIntro">
         <h2>1. Introduction & Overview</h2>
         <p>
-          Welcome to the <strong>Link Budget Calculator</strong> (Version 0.6.11) User Manual. This application is a web-based, baseband channel capacity calculation dashboard designed for hardware design and transmission engineering validation.
+          Welcome to the <strong>Link Budget Calculator</strong> (Version 0.6.12) User Manual. This application is a web-based, baseband channel capacity calculation dashboard designed for hardware design and transmission engineering validation.
         </p>
         <p>
           The calculator is designed to evaluate high-speed automotive communication standards over physical cable models, specifically adhering to guidelines within:
@@ -619,6 +620,55 @@
           <li><strong>Standalone Document Assembly</strong>: Compiles a print-friendly HTML document incorporating the date metadata, configuration summaries, performance grids, Detailed Budget Breakdowns, Channel Losses, Modulation references, PASS/FAIL cards, and the embedded chart images.</li>
           <li><strong>Download Trigger</strong>: Initiates a browser download for the compiled standalone HTML file.</li>
         </ol>
+      </section>
+
+      <!-- Appendix A: Required Slicer SNR -->
+      <section class="manual-section" id="sectionAppendixA">
+        <h2>Appendix A: Required Slicer SNR Calculation</h2>
+        <p>
+          The <strong>Required Slicer SNR</strong> calculation works backward from the Target BER to find the raw signal-to-noise ratio the hardware slicer needs <em>before</em> Forward Error Correction (FEC) is applied.
+        </p>
+        <p>
+          The RS-FEC strongly impacts this calculation, as it relaxes the SNR requirements by allowing a higher raw error rate that the FEC can clean up. Below is the step-by-step logic used in the application.
+        </p>
+
+        <h3>1. Identify FEC Correction Capability ($t$)</h3>
+        <p>
+          The number of correctable symbols $t$ in a Reed-Solomon block of length $N$ and payload $K$ is:
+          <br>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">t = \lfloor (N - K) / 2 \rfloor \times \text{efficiency}</code>
+        </p>
+
+        <h3>2. Determine Required Average Block Errors ($\lambda$)</h3>
+        <p>
+          Using a Poisson approximation for block failures, the calculator determines the average number of raw errors per block ($\lambda$) that would result in the final target BER. The inverse Chi-Squared function is used to solve the Poisson cumulative distribution function where the failure threshold is $t$ errors:
+          <br>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">\lambda = \frac{\text{chiSqInv}(\text{targetBer}, \, 2(t + 1))}{2}</code>
+        </p>
+
+        <h3>3. Convert to Required Slicer SER</h3>
+        <p>
+          The average errors per block ($\lambda$) is divided by the block length $N$ to find the average probability of error per FEC symbol.
+          <br>
+          Because physical line symbols (like PAM4) have a different bit length than FEC symbols, this is scaled back to the physical slicer Symbol Error Rate (SER):
+          <br>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">\text{Required Slicer SER} = 1 - (1 - \frac{\lambda}{N})^{\frac{\text{Bits per Line Symbol}}{\text{Bits per FEC Symbol}}}</code>
+        </p>
+
+        <h3>4. Remove the Impulse Noise Floor</h3>
+        <p>
+          The application assumes some errors are caused by impulse noise rather than Gaussian background noise. The impulse error rate is subtracted to isolate the budget for thermal/Gaussian noise:
+          <br>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">\text{Gaussian SER} = \text{Required Slicer SER} - \text{impulseErrorRate}</code>
+        </p>
+
+        <h3>5. Calculate Required SNR (Inverse Q-Function)</h3>
+        <p>
+          Finally, the standard formula for Pulse-Amplitude Modulation (PAM) error probability is inverted to find the required linear SNR. For a PAM system with $M$ levels:
+          <br>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">Q_{arg} = \text{normInv}\left(1 - \frac{M \times \text{Gaussian SER}}{2(M - 1)}\right)</code>
+          <code style="font-size: 1.1em; display: block; padding: 1rem; margin-top: 0.5rem; background-color: var(--bg-input);">\text{Required Slicer SNR (dB)} = 10 \log_{10}\left( \frac{M^2 - 1}{3} \times (Q_{arg})^2 \right)</code>
+        </p>
       </section>
 
     </main>
