@@ -76,6 +76,11 @@ const DEFAULT_INPUTS = Object.freeze({
 
 // Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
 const CHANNEL_MODELS = {
+  'Cat3': { a: 0, c: 2.3e-9, b: 2.32e-5, p: 0.5, drho: 0.004 },
+  'Cat5': { a: 0, c: 2.3e-10, b: 1.967e-5, p: 0.5, drho: 0.004 },
+  'Cat5e': { a: 0, c: 2.3e-10, b: 1.967e-5, p: 0.5, drho: 0.004 },
+  'Cat6': { a: 0, c: 2.3e-10, b: 1.808e-5, p: 0.5, drho: 0.004 },
+  'Cat7': { a: 0, c: 1.0e-10, b: 1.8e-5, p: 0.5, drho: 0.004 },
   'CX31a': { a: 0.06, c: 7.4e-11, b: 1.4e-5, p: 0.5, drho: 0.004 },
   'CX174e': { a: 0.11, c: 2e-10, b: 2e-5, p: 0.5, drho: 0.004 },
   'eq149-18': { a: 0, c: 1.3333333333333334e-10, b: 9.045189161192256e-5, p: 0.45, drho: 0 },
