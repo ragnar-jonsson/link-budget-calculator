@@ -738,7 +738,7 @@
   <script>
     'use strict';
 
-    const CALCULATOR_VERSION = 'v0.6.15';
+    const CALCULATOR_VERSION = 'v0.6.16';
 
     let lastResult = null;
     let chartInstanceSnr = null;
@@ -770,7 +770,7 @@
       // Set the version badge dynamically from CALCULATOR_VERSION constant
       const badgeVersion = document.querySelector('.badge-version');
       if (badgeVersion) {
-        badgeVersion.textContent = `${CALCULATOR_VERSION} (IEEE 802.3ch / 3cy / 3dm)`;
+        badgeVersion.textContent = `${CALCULATOR_VERSION}`;
       }
 
       // 1. Resolve global models objects
