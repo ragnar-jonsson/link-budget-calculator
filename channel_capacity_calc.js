@@ -383,7 +383,7 @@ function compute(inputOverrides = {}) {
       ? linearToDb(connectorC0 * fHz + input.numberOfConnectors * 0.00073)
       : -1000;
     const channelEchoDb = linearToDb(dbToLinear(wireEchoDb) + dbToLinear(connectorEchoDb));
-    const isHalfDuplex = (input.duplexMode === 'Half-Duplex');
+    const isHalfDuplex = (input.duplexMode === 'Half-Duplex' || input.duplexMode === 'Simplex');
     const rxEchoUs = isHalfDuplex ? -1000 : (channelEchoDb + txPsdDs);
     const rxEchoDs = isHalfDuplex ? -1000 : (channelEchoDb + txPsdUs);
     const echoResUs = isHalfDuplex ? -1000 : (linearToDb(
