@@ -71,7 +71,8 @@ const DEFAULT_INPUTS = Object.freeze({
   connectorEchoModel: 'Hard',
   temperatureC: 20,
   fMaxHz: 9e9,
-  nSteps: 200
+  nSteps: 200,
+  halfDuplex: false
 });
 
 // Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
@@ -382,8 +383,8 @@ function compute(inputOverrides = {}) {
       ? linearToDb(connectorC0 * fHz + input.numberOfConnectors * 0.00073)
       : -1000;
     const channelEchoDb = linearToDb(dbToLinear(wireEchoDb) + dbToLinear(connectorEchoDb));
-    const rxEchoUs = channelEchoDb + txPsdDs;
-    const rxEchoDs = channelEchoDb + txPsdUs;
+    const rxEchoUs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdDs);
+    const rxEchoDs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdUs);
     const echoResUs = linearToDb(
       dbToLinear(rxEchoUs) - dbToLinear(connectorEchoDb + txPsdDs) * (1 - dbToLinear(-input.connectorEchoCancellationDbUs))
     ) - input.cableReflectionEchoCancellationDbUs;

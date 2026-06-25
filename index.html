@@ -107,15 +107,29 @@
             <label for="cableModel">Cable Model</label>
             <select id="cableModel" name="cableModel"></select>
           </div>
-          <div class="form-group full-width">
+          <div class="form-group">
             <label for="connectorEchoModel">Connector Echo Profile</label>
             <select id="connectorEchoModel" name="connectorEchoModel"></select>
+          </div>
+          <div class="form-group">
+            <label for="wireReflectionLimit">Cable Microreflections</label>
+            <select id="wireReflectionLimit" name="wireReflectionLimit">
+              <option value="jonsson*12_08_20">jonsson*12_08_20</option>
+              <option value="jonsson*10_14_20">jonsson*10_14_20</option>
+              <option value="jonsson_3cy_02_03_15_21">jonsson_3cy_02_03_15_21</option>
+              <option value="custom_rule">custom_rule</option>
+              <option value="custom_rule2">custom_rule2</option>
+            </select>
           </div>
         </div>
 
         <!-- Slicer and Transceiver settings -->
         <div class="form-section-title">Transceiver & Modulation</div>
         <div class="form-grid">
+          <div class="form-group" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <input type="checkbox" id="halfDuplex" name="halfDuplex" style="width: auto;">
+            <label for="halfDuplex" style="margin: 0; font-weight: normal; font-size: 0.9rem;" title="Disable echo impairment for half-duplex mode">Half-Duplex</label>
+          </div>
           <div class="form-group">
             <label for="dataRateGbpsUs" title="Upstream data transmission speed in Gbps">Upstream Speed</label>
             <input type="number" id="dataRateGbpsUs" name="dataRateGbpsUs" min="1" max="100" step="0.1">
@@ -195,16 +209,7 @@
                 <label for="pcbTraceLengthM">PCB Length (m)</label>
                 <input type="number" id="pcbTraceLengthM" name="pcbTraceLengthM" min="0" max="1" step="0.0001">
               </div>
-              <div class="form-group">
-                <label for="wireReflectionLimit">Reflection Limit</label>
-                <select id="wireReflectionLimit" name="wireReflectionLimit">
-                  <option value="jonsson*12_08_20">jonsson*12_08_20</option>
-                  <option value="jonsson*10_14_20">jonsson*10_14_20</option>
-                  <option value="jonsson_3cy_02_03_15_21">jonsson_3cy_02_03_15_21</option>
-                  <option value="custom_rule">custom_rule</option>
-                  <option value="custom_rule2">custom_rule2</option>
-                </select>
-              </div>
+
               <div class="form-group">
                 <label for="afeNoiseDbmPerHzUs" title="AFE noise spectral density in dBm/Hz for upstream">AFE Noise US (dBm/Hz)</label>
                 <input type="number" id="afeNoiseDbmPerHzUs" name="afeNoiseDbmPerHzUs" min="-180" max="-100" step="1">
@@ -841,7 +846,11 @@
         if (inputField) {
           // Do not overwrite dropdown selections set above
           if (['cableModel', 'pcbModel', 'connectorEchoModel', 'modulationUs', 'modulationDs'].includes(key)) continue;
-          inputField.value = val;
+          if (inputField.type === 'checkbox') {
+            inputField.checked = val;
+          } else {
+            inputField.value = val;
+          }
         }
       }
 
@@ -1060,7 +1069,11 @@
       const formData = new FormData(form);
       const config = {};
 
+      const halfDuplexEl = document.getElementById('halfDuplex');
+      if (halfDuplexEl) config.halfDuplex = halfDuplexEl.checked;
+
       formData.forEach((value, key) => {
+        if (key === 'halfDuplex') return;
         // Handle scenario metadata strings directly
         if (key === 'configTitle' || key === 'configDescription') {
           config[key] = value;
