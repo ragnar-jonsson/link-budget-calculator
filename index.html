@@ -126,9 +126,12 @@
         <!-- Slicer and Transceiver settings -->
         <div class="form-section-title">Transceiver & Modulation</div>
         <div class="form-grid">
-          <div class="form-group" style="grid-column: 1 / -1; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-            <input type="checkbox" id="halfDuplex" name="halfDuplex" style="width: auto;">
-            <label for="halfDuplex" style="margin: 0; font-weight: normal; font-size: 0.9rem;" title="Disable echo impairment for half-duplex mode">Half-Duplex</label>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label for="duplexMode" title="Select whether to use full-duplex with echo cancellation, or half-duplex">Duplex Mode</label>
+            <select id="duplexMode" name="duplexMode">
+              <option value="Echo Canceled">Echo Canceled</option>
+              <option value="Half-Duplex">Half-Duplex</option>
+            </select>
           </div>
           <div class="form-group">
             <label for="dataRateGbpsUs" title="Upstream data transmission speed in Gbps">Upstream Speed</label>
@@ -1069,11 +1072,7 @@
       const formData = new FormData(form);
       const config = {};
 
-      const halfDuplexEl = document.getElementById('halfDuplex');
-      if (halfDuplexEl) config.halfDuplex = halfDuplexEl.checked;
-
       formData.forEach((value, key) => {
-        if (key === 'halfDuplex') return;
         // Handle scenario metadata strings directly
         if (key === 'configTitle' || key === 'configDescription') {
           config[key] = value;

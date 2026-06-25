@@ -72,7 +72,7 @@ const DEFAULT_INPUTS = Object.freeze({
   temperatureC: 20,
   fMaxHz: 9e9,
   nSteps: 200,
-  halfDuplex: false
+  duplexMode: 'Echo Canceled'
 });
 
 // Channels!W:AL parameter table. Formula: IL_per_m = a + b*((1+drho*(T-20))*f)^p + c*f
@@ -383,12 +383,13 @@ function compute(inputOverrides = {}) {
       ? linearToDb(connectorC0 * fHz + input.numberOfConnectors * 0.00073)
       : -1000;
     const channelEchoDb = linearToDb(dbToLinear(wireEchoDb) + dbToLinear(connectorEchoDb));
-    const rxEchoUs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdDs);
-    const rxEchoDs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdUs);
-    const echoResUs = input.halfDuplex ? -1000 : (linearToDb(
+    const isHalfDuplex = (input.duplexMode === 'Half-Duplex');
+    const rxEchoUs = isHalfDuplex ? -1000 : (channelEchoDb + txPsdDs);
+    const rxEchoDs = isHalfDuplex ? -1000 : (channelEchoDb + txPsdUs);
+    const echoResUs = isHalfDuplex ? -1000 : (linearToDb(
       Math.max(1e-100, dbToLinear(rxEchoUs) - dbToLinear(connectorEchoDb + txPsdDs) * (1 - dbToLinear(-input.connectorEchoCancellationDbUs)))
     ) - input.cableReflectionEchoCancellationDbUs);
-    const echoResDs = input.halfDuplex ? -1000 : (linearToDb(
+    const echoResDs = isHalfDuplex ? -1000 : (linearToDb(
       Math.max(1e-100, dbToLinear(rxEchoDs) - dbToLinear(connectorEchoDb + txPsdUs) * (1 - dbToLinear(-input.connectorEchoCancellationDbDs)))
     ) - input.cableReflectionEchoCancellationDbDs);
     const linearNoiseUs = dbToLinear(input.afeNoiseDbmPerHzUs) + dbToLinear(echoResUs);
