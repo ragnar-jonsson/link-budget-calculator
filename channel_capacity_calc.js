@@ -385,12 +385,12 @@ function compute(inputOverrides = {}) {
     const channelEchoDb = linearToDb(dbToLinear(wireEchoDb) + dbToLinear(connectorEchoDb));
     const rxEchoUs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdDs);
     const rxEchoDs = input.halfDuplex ? -1000 : (channelEchoDb + txPsdUs);
-    const echoResUs = linearToDb(
-      dbToLinear(rxEchoUs) - dbToLinear(connectorEchoDb + txPsdDs) * (1 - dbToLinear(-input.connectorEchoCancellationDbUs))
-    ) - input.cableReflectionEchoCancellationDbUs;
-    const echoResDs = linearToDb(
-      dbToLinear(rxEchoDs) - dbToLinear(connectorEchoDb + txPsdUs) * (1 - dbToLinear(-input.connectorEchoCancellationDbDs))
-    ) - input.cableReflectionEchoCancellationDbDs;
+    const echoResUs = input.halfDuplex ? -1000 : (linearToDb(
+      Math.max(1e-100, dbToLinear(rxEchoUs) - dbToLinear(connectorEchoDb + txPsdDs) * (1 - dbToLinear(-input.connectorEchoCancellationDbUs)))
+    ) - input.cableReflectionEchoCancellationDbUs);
+    const echoResDs = input.halfDuplex ? -1000 : (linearToDb(
+      Math.max(1e-100, dbToLinear(rxEchoDs) - dbToLinear(connectorEchoDb + txPsdUs) * (1 - dbToLinear(-input.connectorEchoCancellationDbDs)))
+    ) - input.cableReflectionEchoCancellationDbDs);
     const linearNoiseUs = dbToLinear(input.afeNoiseDbmPerHzUs) + dbToLinear(echoResUs);
     const linearNoiseDs = dbToLinear(input.afeNoiseDbmPerHzDs) + dbToLinear(echoResDs);
     const noiseUs = linearToDb(linearNoiseUs);
