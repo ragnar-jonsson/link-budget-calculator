@@ -476,10 +476,24 @@ if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     excelApproxVlookupFrequency
   };
 } else {
-  window.compute = compute;
-  window.DEFAULT_INPUTS = DEFAULT_INPUTS;
-  window.CHANNEL_MODELS = CHANNEL_MODELS;
-  window.CONNECTOR_ECHO_C0 = CONNECTOR_ECHO_C0;
-  window.MODULATION_TABLE = MODULATION_TABLE;
+  globalThis.compute = compute;
+  globalThis.DEFAULT_INPUTS = DEFAULT_INPUTS;
+  globalThis.CHANNEL_MODELS = CHANNEL_MODELS;
+  globalThis.CONNECTOR_ECHO_C0 = CONNECTOR_ECHO_C0;
+  globalThis.MODULATION_TABLE = MODULATION_TABLE;
 }
+// ES module exports for Deno
+export {
+  compute,
+  DEFAULT_INPUTS,
+  CHANNEL_MODELS,
+  CONNECTOR_ECHO_C0,
+  MODULATION_TABLE,
+  normInv,
+  chiSqInv,
+  psdMaskDbmPerHz,
+  channelInsertionLossPerMeterDb,
+  excelApproxVlookupFrequency,
+};
+
 
