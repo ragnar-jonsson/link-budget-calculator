@@ -4,9 +4,10 @@ An interactive, link budget calculator based on Salz SNR calculations and channe
 
 ---
 
-## 📖 Interactive User Manual
-For a detailed breakdown of the mathematical engine, parameter directories, and output indicators, open the local user manual directly in your browser:
+## 📖 Documentation & Technical Reports
 * **[User Manual](user_manual.html)** (interactive sidebar navigation, ScrollSpy, and searchable parameter dictionary)
+* **[AI Agent API Guide](AI_AGENT_API_GUIDE.md)** (complete specification for AI agents and scripts to query the JSON API)
+* **[Modulation Comparison Report (802.3cy)](MODULATION_COMPARISON_802_3cy_REPORT.md)** (PAM2 vs PAM3 vs PAM4 vs PAM8 reach and SNR margin analysis)
 
 ---
 

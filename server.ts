@@ -22,13 +22,19 @@ const handler = async (request: Request): Promise<Response> => {
       const result = compute(overrides);
       return new Response(JSON.stringify({ success: true, result }), {
         status: 200,
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
     } catch (e) {
       console.error("Compute error:", e);
       return new Response(JSON.stringify({ success: false, error: e.message }), {
         status: 500,
-        headers: { "content-type": "application/json" },
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       });
     }
   }
@@ -48,7 +54,7 @@ const handler = async (request: Request): Promise<Response> => {
   }
   // Serve static files (HTML, JS, CSS, etc.) for other GET requests
   if (request.method === "GET") {
-    const safePath = pathname.replace(/^\/+/, "");
+    const safePath = pathname.replace(/^\\+/, "");
     const filePath = `${Deno.cwd()}/${safePath}`;
     try {
       const fileData = await Deno.readFile(filePath);
@@ -77,10 +83,13 @@ const handler = async (request: Request): Promise<Response> => {
   // Default 404 response
   return new Response(JSON.stringify({ error: "Not found" }), {
     status: 404,
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
   });
 };
 
 const port = Number(Deno.env.get("PORT") ?? "3000");
-console.log(`Link‑budget calculator API listening on http://localhost:${port}`);
-Deno.serve({ port }, handler);
+console.log(`Link‑budget calculator API listening on http://0.0.0.0:${port}`);
+Deno.serve({ port, hostname: "0.0.0.0" }, handler);
